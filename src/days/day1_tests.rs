@@ -37,7 +37,23 @@ fn test_line_to_number_no_digits() {
 }
 
 #[test]
+fn test_line_to_number_two_digits_as_words() {
+  assert_eq!(day1::line_to_number("two1nine"), 29)
+}
+
+#[test]
+fn test_line_to_number_two_digits_as_words_some_words_intersect() {
+  assert_eq!(day1::line_to_number("eightwothree"), 83)
+}
+
+#[test]
 fn test_solution_part1() {
-  let parsed = day1::parse(day1::INPUT);
+  let parsed = day1::parse(day1::INPUT_PART_1);
   assert_eq!(day1::solution_part_1(&parsed), 142)
+}
+
+#[test]
+fn test_solution_part2() {
+  let parsed = day1::parse(day1::INPUT_PART_2);
+  assert_eq!(day1::solution_part_2(&parsed), 281)
 }
