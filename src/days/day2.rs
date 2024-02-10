@@ -26,16 +26,16 @@ impl CubeSet {
 #[derive(Debug)]
 pub struct Game {
     pub id: u16,
-    pub drawings: Vec<CubeSet>
+    pub draws: Vec<CubeSet>
 }
 
 impl Game {
-    pub fn new(id: u16, drawings: Vec<CubeSet>) -> Self {
-        Game { id, drawings }
+    pub fn new(id: u16, draws: Vec<CubeSet>) -> Self {
+        Game { id, draws }
     }
 }
 
-fn parse_drawing(input: &str) -> CubeSet {
+fn parse_cube_set(input: &str) -> CubeSet {
     fn find_color_count(cube_counts: &Vec<(u16, &str)>, color_to_find: &str) -> u16 {
         cube_counts.iter().find_map(|(count, color)|
             if *color == color_to_find { Some(*count) } else { None }
@@ -54,12 +54,12 @@ fn parse_drawing(input: &str) -> CubeSet {
 
 fn parse_line(line: &str) -> Game {
     let split_line = line.split(':').take(2).collect::<Vec<&str>>();
-    let (game_input, drawings_input) = (split_line[0], split_line[1]);
+    let (game_input, cube_sets_input) = (split_line[0], split_line[1]);
     let game_id = u16::from_str_radix(&game_input["Game ".len()..], 10).unwrap();
-    let drawings: Vec<CubeSet> = drawings_input.split(';').map(|drawing_input| parse_drawing(drawing_input)).collect();
+    let cube_sets: Vec<CubeSet> = cube_sets_input.split(';').map(|drawing_input| parse_cube_set(drawing_input)).collect();
     Game {
         id: game_id,
-        drawings: drawings
+        draws: cube_sets
     }
 }
 
