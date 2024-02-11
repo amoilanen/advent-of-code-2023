@@ -65,7 +65,7 @@ fn parse_line(line: &str) -> Game {
 
 pub fn parse(input: &str) -> Vec<Game> {
     input.split_terminator('\n')
-        .map(|line| parse_line(line))
+        .map(|line| parse_line(line.trim()))
         .collect()
 }
 
