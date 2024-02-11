@@ -55,7 +55,23 @@ fn test_parse_multiline_input() {
 }
 
 #[test]
+fn test_fewest_number_of_cubes() {
+    let game = Game:: new(1, vec![
+        CubeSet::new(4, 0, 3),
+        CubeSet::new(1, 2, 6),
+        CubeSet::new(0, 2, 0)
+    ]);
+    assert_eq!(game.minimal_cube_set(), CubeSet::new(4, 2, 6))
+}
+
+#[test]
 fn test_solution_part1() {
   let parsed = day2::parse(day2::INPUT);
   assert_eq!(day2::solution_part_1(&parsed), 8)
+}
+
+#[test]
+fn test_solution_part2() {
+  let parsed = day2::parse(day2::INPUT);
+  assert_eq!(day2::solution_part_2(&parsed), 2286)
 }

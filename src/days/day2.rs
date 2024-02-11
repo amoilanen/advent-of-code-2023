@@ -22,6 +22,10 @@ impl CubeSet {
     pub fn has_possible_draw(&self, draw: &CubeSet) -> bool {
         draw.red <= self.red && draw.green <= self.green && draw.blue <= self.blue
     }
+
+    pub fn game_power(&self) -> u16 {
+        self.red * self.green * self.blue
+    }
 }
 
 #[derive(PartialEq)]
@@ -34,6 +38,13 @@ pub struct Game {
 impl Game {
     pub fn new(id: u16, draws: Vec<CubeSet>) -> Self {
         Game { id, draws }
+    }
+
+    pub fn minimal_cube_set(&self) -> CubeSet {
+        let required_reds = self.draws.iter().map(|draw| draw.red).max().unwrap_or(0);
+        let required_greens = self.draws.iter().map(|draw| draw.green).max().unwrap_or(0);
+        let required_blues = self.draws.iter().map(|draw| draw.blue).max().unwrap_or(0);
+        CubeSet::new(required_reds, required_greens, required_blues)
     }
 }
 
@@ -84,6 +95,6 @@ pub fn solution_part_1(parsed_input: &Vec<Game>) -> u16 {
     return sum_of_possible_game_ids;
 }
 
-pub fn solution_part_2(parsed_input: &Vec<&str>) -> u32 {
-    1
+pub fn solution_part_2(parsed_input: &Vec<Game>) -> u16 {
+    parsed_input.iter().map(|game| game.minimal_cube_set().game_power()).sum()
 }
