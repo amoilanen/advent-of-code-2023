@@ -53,3 +53,9 @@ fn test_parse_multiline_input() {
         ])
     ])
 }
+
+#[test]
+fn test_solution_part1() {
+  let parsed = day2::parse(day2::INPUT);
+  assert_eq!(day2::solution_part_1(&parsed), 8)
+}

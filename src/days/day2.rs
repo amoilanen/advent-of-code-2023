@@ -1,6 +1,4 @@
-use std::collections::HashMap;
-
-pub const INPUT_PART: &str = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+pub const INPUT: &str = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
 Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
@@ -19,6 +17,10 @@ impl CubeSet {
         CubeSet {
             red, green, blue
         }
+    }
+
+    pub fn has_possible_draw(&self, draw: &CubeSet) -> bool {
+        draw.red <= self.red && draw.green <= self.green && draw.blue <= self.blue
     }
 }
 
@@ -75,8 +77,11 @@ pub fn solution_part_1(parsed_input: &Vec<Game>) -> u16 {
         green: 13,
         blue: 14
     };
-    //TODO: Implement
-    return 1;
+    let possible_games: Vec<&Game> = parsed_input.iter().filter(|game| {
+        game.draws.iter().all(|draw| total_cubes.has_possible_draw(draw))
+    }).collect();
+    let sum_of_possible_game_ids: u16 = possible_games.iter().map(|game| game.id).sum();
+    return sum_of_possible_game_ids;
 }
 
 pub fn solution_part_2(parsed_input: &Vec<&str>) -> u32 {
