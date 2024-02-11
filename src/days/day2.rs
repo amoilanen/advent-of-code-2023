@@ -23,8 +23,8 @@ impl CubeSet {
         draw.red <= self.red && draw.green <= self.green && draw.blue <= self.blue
     }
 
-    pub fn game_power(&self) -> u16 {
-        self.red * self.green * self.blue
+    pub fn game_power(&self) -> u32 {
+        (self.red as u32) * (self.green as u32) * (self.blue as u32)
     }
 }
 
@@ -95,6 +95,6 @@ pub fn solution_part_1(parsed_input: &Vec<Game>) -> u16 {
     return sum_of_possible_game_ids;
 }
 
-pub fn solution_part_2(parsed_input: &Vec<Game>) -> u16 {
+pub fn solution_part_2(parsed_input: &Vec<Game>) -> u32 {
     parsed_input.iter().map(|game| game.minimal_cube_set().game_power()).sum()
 }
