@@ -80,12 +80,12 @@ pub fn parse(input: &str) -> Schematic {
 
     fn on_number_read_finished(row_index: usize, column_index: usize, current_number: &mut Vec<char>, numbers: &mut Vec<SchematicNumber>) {
         let number: String = current_number.iter().collect::<String>();
-        let coordinates: Vec<Position> = (column_index - number.len()..column_index).map(|column| Position::new(row_index, column)).collect();
+        let coordinates: Vec<Position> = (column_index + 1 - number.len()..=column_index).map(|column| Position::new(row_index, column)).collect();
         numbers.push(SchematicNumber::new(number.parse().unwrap_or(0), coordinates));
         current_number.clear()
     }
 
-    fn on_symbol_read_finished(current_char: char, row_index: usize, column_index: usize, symbols: &mut Vec<SchematicSymbol>) {
+    fn on_symbol_read_finished(row_index: usize, column_index: usize, current_char: char, symbols: &mut Vec<SchematicSymbol>) {
         symbols.push(SchematicSymbol::new(current_char, Position::new(row_index, column_index)))
     }
 
@@ -102,10 +102,10 @@ pub fn parse(input: &str) -> Schematic {
             } else {
                 // Non-numeric current_char
                 if current_number.len() > 0 {
-                    on_number_read_finished(row_index, column_index, &mut current_number, &mut numbers);
+                    on_number_read_finished(row_index, column_index - 1, &mut current_number, &mut numbers);
                 }
                 if current_char != '.' {
-                    on_symbol_read_finished(current_char, row_index, column_index, &mut symbols);
+                    on_symbol_read_finished(row_index, column_index, current_char, &mut symbols);
                 }
             }
             column_index = column_index + 1;
