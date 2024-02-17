@@ -21,3 +21,17 @@ fn test_parse() {
         ]
     })
 }
+
+#[test]
+fn test_get_part_numbers() {
+    let input: &str = 
+"467..114..
+ ...*......
+ ..35..633.";
+    let schematic: Schematic = day3::parse(input);
+    let result = day3::get_part_numbers(&schematic);
+    assert_eq!(result, vec![
+        &SchematicNumber::new(467, vec![ Position::new(0, 0), Position::new(0, 1), Position::new(0, 2)]),
+        &SchematicNumber::new(35, vec![ Position::new(2, 2), Position::new(2, 3)])
+    ]);
+}

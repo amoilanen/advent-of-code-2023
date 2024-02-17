@@ -1,4 +1,4 @@
-use core::num;
+use std::collections::HashSet;
 
 pub const INPUT: &str = "467..114..
 ...*......
@@ -11,18 +11,27 @@ pub const INPUT: &str = "467..114..
 ...$.*....
 .664.598..";
 
-#[derive(PartialEq)]
 #[derive(Debug)]
+#[derive(Hash)]
+#[derive(PartialEq)]
+#[derive(Eq)]
 pub struct Position {
     pub row: usize,
     pub column: usize
 }
 
 impl Position {
-    fn is_adjacent_to(&self, other: &Position) -> bool {
-        ((other.row as i16) - (self.row as i16)).abs() <= 1
-        &&
-        ((other.column as i16) - (self.column as i16)).abs() <= 1
+
+    pub fn adjacent_positions(&self) -> Vec<Position> {
+        let mut adjacent: Vec<Position> = Vec::new();
+        for adjacent_row in [self.row as i16 - 1, self.row as i16, self.row as i16 + 1] {
+            for adjacent_column in [self.column as i16 - 1, self.column as i16, self.column as i16 + 1] {
+                if adjacent_row >= 0 && adjacent_column >= 0 && (adjacent_row != self.row as i16 || adjacent_column != self.column as i16) {
+                    adjacent.push(Position::new(adjacent_row as usize, adjacent_column as usize));
+                } 
+            }
+        }
+        adjacent
     }
 
     pub fn new(row: usize, column: usize) -> Position {
@@ -40,6 +49,18 @@ pub struct SchematicNumber {
 impl SchematicNumber {
     pub fn new(value: u16, coordinates: Vec<Position>) -> SchematicNumber {
         SchematicNumber {value, coordinates}
+    }
+
+    pub fn adjacent_positions(&self) -> Vec<Position> {
+        let mut adjacent: Vec<Position> = Vec::new();
+        for coordinate in &self.coordinates {
+            for position in coordinate.adjacent_positions() {
+                if !self.coordinates.contains(&position) {
+                    adjacent.push(position)
+                }
+            }
+        }
+        adjacent
     }
 }
 
@@ -66,6 +87,23 @@ pub struct Schematic {
 
 fn parse_line(line: &str) -> Vec<char> {
     line.chars().collect()
+}
+
+pub fn get_part_numbers(schematic: &Schematic) -> Vec<&SchematicNumber> {
+    let mut symbol_positions: HashSet<&Position> = HashSet::new();
+    for symbol in schematic.symbols.iter() {
+        symbol_positions.insert(&symbol.position);
+    }
+
+    let mut part_numbers: Vec<&SchematicNumber> = Vec::new();
+    for number in schematic.numbers.iter() {
+        let adjacent_positions = number.adjacent_positions();
+        let is_part_number = adjacent_positions.iter().any(|position| symbol_positions.contains(position));
+        if is_part_number {
+            part_numbers.push(number);
+        }
+    }
+    part_numbers
 }
 
 pub fn parse(input: &str) -> Schematic {
