@@ -53,6 +53,12 @@ fn test_get_part_numbers() {
 
 #[test]
 fn test_solution_part1() {
-  let parsed = day3::parse(day3::INPUT);
-  assert_eq!(day3::solution_part_1(&parsed), 4361)
+    let parsed = day3::parse(day3::INPUT);
+    assert_eq!(day3::solution_part_1(&parsed), 4361)
+}
+
+#[test]
+fn test_solution_part2() {
+    let parsed = day3::parse(day3::INPUT);
+    assert_eq!(day3::solution_part_2(&parsed), 467835)
 }

@@ -59,6 +59,10 @@ impl SchematicSymbol {
     pub fn new(value: char, position: Position) -> SchematicSymbol {
         SchematicSymbol {value, position}
     }
+
+    pub fn is_a_neighbor_of(&self, number: &SchematicNumber) -> bool {
+        number.is_a_neighbor_of(self)
+    }
 }
 
 #[derive(PartialEq)]
@@ -130,6 +134,17 @@ pub fn solution_part_1(schematic: &Schematic) -> u32 {
     part_numbers.iter().fold(0, |acc, part_number| acc + part_number.value as u32)
 }
 
-pub fn solution_part_2(parsed_input: &Schematic) -> u32 {
-    1
+pub fn solution_part_2(schematic: &Schematic) -> u32 {
+    let potential_gears: Vec<&SchematicSymbol> = schematic.symbols.iter().filter(|symbol| symbol.value == '*').collect();
+    let mut gears_with_numbers: Vec<(&SchematicSymbol, Vec<&SchematicNumber>)> = Vec::new();
+    potential_gears.iter().for_each(|potential_gear| {
+        let adjacent_part_numbers: Vec<&SchematicNumber> = schematic.numbers.iter()
+            .filter(|number| number.is_a_neighbor_of(&potential_gear)).collect();
+        if adjacent_part_numbers.len() == 2 {
+            gears_with_numbers.push((potential_gear, adjacent_part_numbers))
+        }
+    });
+    gears_with_numbers.iter().map(|(_, numbers)| {
+        numbers.iter().map(|number| number.value as u32).product::<u32>()
+    }).sum()
 }
