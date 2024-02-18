@@ -87,6 +87,19 @@ pub fn get_part_numbers(schematic: &Schematic) -> Vec<&SchematicNumber> {
     part_numbers
 }
 
+pub fn get_gears_with_adjacent_numbers(schematic: &Schematic) -> Vec<(&SchematicSymbol, Vec<&SchematicNumber>)> {
+    let potential_gears: Vec<&SchematicSymbol> = schematic.symbols.iter().filter(|symbol| symbol.value == '*').collect();
+    let mut gears_with_numbers: Vec<(&SchematicSymbol, Vec<&SchematicNumber>)> = Vec::new();
+    potential_gears.iter().for_each(|potential_gear| {
+        let adjacent_part_numbers: Vec<&SchematicNumber> = schematic.numbers.iter()
+            .filter(|number| number.is_a_neighbor_of(&potential_gear)).collect();
+        if adjacent_part_numbers.len() == 2 {
+            gears_with_numbers.push((potential_gear, adjacent_part_numbers))
+        }
+    });
+    gears_with_numbers
+}
+
 pub fn parse(input: &str) -> Schematic {
     let rows: Vec<Vec<char>> = input.split_terminator('\n')
         .map(|line| parse_line(line.trim()))
@@ -135,16 +148,9 @@ pub fn solution_part_1(schematic: &Schematic) -> u32 {
 }
 
 pub fn solution_part_2(schematic: &Schematic) -> u32 {
-    let potential_gears: Vec<&SchematicSymbol> = schematic.symbols.iter().filter(|symbol| symbol.value == '*').collect();
-    let mut gears_with_numbers: Vec<(&SchematicSymbol, Vec<&SchematicNumber>)> = Vec::new();
-    potential_gears.iter().for_each(|potential_gear| {
-        let adjacent_part_numbers: Vec<&SchematicNumber> = schematic.numbers.iter()
-            .filter(|number| number.is_a_neighbor_of(&potential_gear)).collect();
-        if adjacent_part_numbers.len() == 2 {
-            gears_with_numbers.push((potential_gear, adjacent_part_numbers))
-        }
-    });
+    let gears_with_numbers = get_gears_with_adjacent_numbers(schematic);
     gears_with_numbers.iter().map(|(_, numbers)| {
-        numbers.iter().map(|number| number.value as u32).product::<u32>()
+        let gear_ratio = numbers.iter().map(|number| number.value as u32).product::<u32>();
+        gear_ratio
     }).sum()
 }
