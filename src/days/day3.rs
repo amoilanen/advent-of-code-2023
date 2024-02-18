@@ -155,8 +155,9 @@ pub fn parse(input: &str) -> Schematic {
     Schematic { rows, numbers, symbols }
 }
 
-pub fn solution_part_1(parsed_input: &Schematic) -> u16 {
-    1
+pub fn solution_part_1(schematic: &Schematic) -> u16 {
+    let part_numbers = get_part_numbers(&schematic);
+    part_numbers.iter().fold(0, |acc, part_number| acc + part_number.value)
 }
 
 pub fn solution_part_2(parsed_input: &Schematic) -> u32 {

@@ -35,3 +35,9 @@ fn test_get_part_numbers() {
         &SchematicNumber::new(35, vec![ Position::new(2, 2), Position::new(2, 3)])
     ]);
 }
+
+#[test]
+fn test_solution_part1() {
+  let parsed = day3::parse(day3::INPUT);
+  assert_eq!(day3::solution_part_1(&parsed), 4361)
+}
