@@ -1,3 +1,4 @@
+#[cfg(test)]
 use crate::day3::{Position, Schematic, SchematicNumber, SchematicSymbol};
 #[cfg(test)]
 use crate::days::day3;
@@ -13,8 +14,8 @@ fn test_parse() {
             "..34..".chars().collect()
         ],
         numbers: vec![
-            SchematicNumber::new(12, vec![ Position::new(0, 0), Position::new(0, 1)]),
-            SchematicNumber::new(34, vec![ Position::new(1, 2), Position::new(1, 3)]),
+            SchematicNumber::new(12,Position::new(0, 0), Position::new(0, 1)),
+            SchematicNumber::new(34, Position::new(1, 2), Position::new(1, 3)),
         ],
         symbols: vec![
             SchematicSymbol::new('*', Position::new(0, 4))
@@ -31,8 +32,8 @@ fn test_get_part_numbers() {
     let schematic: Schematic = day3::parse(input);
     let result = day3::get_part_numbers(&schematic);
     assert_eq!(result, vec![
-        &SchematicNumber::new(467, vec![ Position::new(0, 0), Position::new(0, 1), Position::new(0, 2)]),
-        &SchematicNumber::new(35, vec![ Position::new(2, 2), Position::new(2, 3)])
+        &SchematicNumber::new(467, Position::new(0, 0), Position::new(0, 2)),
+        &SchematicNumber::new(35, Position::new(2, 2), Position::new(2, 3))
     ]);
 }
 

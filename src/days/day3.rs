@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 pub const INPUT: &str = "467..114..
 ...*......
 ..35..633.
@@ -16,25 +14,16 @@ pub const INPUT: &str = "467..114..
 #[derive(PartialEq)]
 #[derive(Eq)]
 pub struct Position {
-    pub row: usize,
-    pub column: usize
+    pub row: i16,
+    pub column: i16
 }
 
 impl Position {
-
-    pub fn adjacent_positions(&self) -> Vec<Position> {
-        let mut adjacent: Vec<Position> = Vec::new();
-        for adjacent_row in [self.row as i16 - 1, self.row as i16, self.row as i16 + 1] {
-            for adjacent_column in [self.column as i16 - 1, self.column as i16, self.column as i16 + 1] {
-                if adjacent_row >= 0 && adjacent_column >= 0 && (adjacent_row != self.row as i16 || adjacent_column != self.column as i16) {
-                    adjacent.push(Position::new(adjacent_row as usize, adjacent_column as usize));
-                } 
-            }
-        }
-        adjacent
+    pub fn is_within_rectangle(&self, left_top: &Position, right_bottom: &Position) -> bool {
+        self.row >= left_top.row && self.row <= right_bottom.row
+            && self.column >= left_top.column && self.column <= right_bottom.column
     }
-
-    pub fn new(row: usize, column: usize) -> Position {
+    pub fn new(row: i16, column: i16) -> Position {
         Position {row, column}
     }
 }
@@ -43,24 +32,19 @@ impl Position {
 #[derive(Debug)]
 pub struct SchematicNumber {
     pub value: u16,
-    pub coordinates: Vec<Position>
+    pub start: Position,
+    pub end: Position
 }
 
 impl SchematicNumber {
-    pub fn new(value: u16, coordinates: Vec<Position>) -> SchematicNumber {
-        SchematicNumber {value, coordinates}
+    pub fn new(value: u16, start: Position, end: Position) -> SchematicNumber {
+        SchematicNumber {value, start, end}
     }
 
-    pub fn adjacent_positions(&self) -> Vec<Position> {
-        let mut adjacent: Vec<Position> = Vec::new();
-        for coordinate in &self.coordinates {
-            for position in coordinate.adjacent_positions() {
-                if !self.coordinates.contains(&position) {
-                    adjacent.push(position)
-                }
-            }
-        }
-        adjacent
+    pub fn is_a_neighbor_of(&self, symbol: &SchematicSymbol) -> bool {
+        let left_top = Position::new(self.start.row - 1, self.start.column - 1);
+        let right_bottom = Position::new(self.end.row + 1, self.end.column + 1);
+        symbol.position.is_within_rectangle(&left_top, &right_bottom)
     }
 }
 
@@ -90,15 +74,9 @@ fn parse_line(line: &str) -> Vec<char> {
 }
 
 pub fn get_part_numbers(schematic: &Schematic) -> Vec<&SchematicNumber> {
-    let mut symbol_positions: HashSet<&Position> = HashSet::new();
-    for symbol in schematic.symbols.iter() {
-        symbol_positions.insert(&symbol.position);
-    }
-
     let mut part_numbers: Vec<&SchematicNumber> = Vec::new();
     for number in schematic.numbers.iter() {
-        let adjacent_positions = number.adjacent_positions();
-        let is_part_number = adjacent_positions.iter().any(|position| symbol_positions.contains(position));
+        let is_part_number = schematic.symbols.iter().any(|symbol| number.is_a_neighbor_of(symbol));
         if is_part_number {
             part_numbers.push(number);
         }
@@ -116,14 +94,16 @@ pub fn parse(input: &str) -> Schematic {
         current_number.push(current_char)
     }
 
-    fn on_number_read_finished(row_index: usize, column_index: usize, current_number: &mut Vec<char>, numbers: &mut Vec<SchematicNumber>) {
+    fn on_number_read_finished(row_index: i16, column_index: i16, current_number: &mut Vec<char>, numbers: &mut Vec<SchematicNumber>) {
         let number: String = current_number.iter().collect::<String>();
-        let coordinates: Vec<Position> = (column_index + 1 - number.len()..=column_index).map(|column| Position::new(row_index, column)).collect();
-        numbers.push(SchematicNumber::new(number.parse().unwrap_or(0), coordinates));
+        let value = number.parse().unwrap_or(0);
+        let start = Position::new(row_index, column_index + 1 - (number.len() as i16));
+        let end = Position::new(row_index, column_index);
+        numbers.push(SchematicNumber::new(value, start, end));
         current_number.clear()
     }
 
-    fn on_symbol_read_finished(row_index: usize, column_index: usize, current_char: char, symbols: &mut Vec<SchematicSymbol>) {
+    fn on_symbol_read_finished(row_index: i16, column_index: i16, current_char: char, symbols: &mut Vec<SchematicSymbol>) {
         symbols.push(SchematicSymbol::new(current_char, Position::new(row_index, column_index)))
     }
 
@@ -140,24 +120,24 @@ pub fn parse(input: &str) -> Schematic {
             } else {
                 // Non-numeric current_char
                 if current_number.len() > 0 {
-                    on_number_read_finished(row_index, column_index - 1, &mut current_number, &mut numbers);
+                    on_number_read_finished(row_index as i16, (column_index - 1) as i16, &mut current_number, &mut numbers);
                 }
                 if current_char != '.' {
-                    on_symbol_read_finished(row_index, column_index, current_char, &mut symbols);
+                    on_symbol_read_finished(row_index as i16, column_index as i16, current_char, &mut symbols);
                 }
             }
             column_index = column_index + 1;
         }
         if current_number.len() > 0 {
-            on_number_read_finished(row_index, column_index, &mut current_number, &mut numbers);
+            on_number_read_finished(row_index as i16, column_index as i16, &mut current_number, &mut numbers);
         }
     }
     Schematic { rows, numbers, symbols }
 }
 
-pub fn solution_part_1(schematic: &Schematic) -> u16 {
+pub fn solution_part_1(schematic: &Schematic) -> u32 {
     let part_numbers = get_part_numbers(&schematic);
-    part_numbers.iter().fold(0, |acc, part_number| acc + part_number.value)
+    part_numbers.iter().fold(0, |acc, part_number| acc + part_number.value as u32)
 }
 
 pub fn solution_part_2(parsed_input: &Schematic) -> u32 {
