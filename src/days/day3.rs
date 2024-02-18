@@ -64,7 +64,6 @@ impl SchematicSymbol {
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub struct Schematic {
-    pub rows: Vec<Vec<char>>,
     pub numbers: Vec<SchematicNumber>,
     pub symbols: Vec<SchematicSymbol>
 }
@@ -89,11 +88,6 @@ pub fn parse(input: &str) -> Schematic {
         .map(|line| parse_line(line.trim()))
         .collect();
 
-
-    fn on_number_read(current_char: char, current_number: &mut Vec<char>) {
-        current_number.push(current_char)
-    }
-
     fn on_number_read_finished(row_index: i16, column_index: i16, current_number: &mut Vec<char>, numbers: &mut Vec<SchematicNumber>) {
         let number: String = current_number.iter().collect::<String>();
         let value = number.parse().unwrap_or(0);
@@ -101,10 +95,6 @@ pub fn parse(input: &str) -> Schematic {
         let end = Position::new(row_index, column_index);
         numbers.push(SchematicNumber::new(value, start, end));
         current_number.clear()
-    }
-
-    fn on_symbol_read_finished(row_index: i16, column_index: i16, current_char: char, symbols: &mut Vec<SchematicSymbol>) {
-        symbols.push(SchematicSymbol::new(current_char, Position::new(row_index, column_index)))
     }
 
     let mut numbers: Vec<SchematicNumber> = Vec::new();
@@ -116,23 +106,23 @@ pub fn parse(input: &str) -> Schematic {
         while column_index < number_of_columns {
             let current_char = row[column_index];
             if current_char.is_numeric() {
-                on_number_read(current_char, &mut current_number);
+                current_number.push(current_char);
             } else {
                 // Non-numeric current_char
                 if current_number.len() > 0 {
                     on_number_read_finished(row_index as i16, (column_index - 1) as i16, &mut current_number, &mut numbers);
                 }
                 if current_char != '.' {
-                    on_symbol_read_finished(row_index as i16, column_index as i16, current_char, &mut symbols);
+                    symbols.push(SchematicSymbol::new(current_char, Position::new(row_index as i16, column_index as i16)))
                 }
             }
             column_index = column_index + 1;
         }
         if current_number.len() > 0 {
-            on_number_read_finished(row_index as i16, column_index as i16, &mut current_number, &mut numbers);
+            on_number_read_finished(row_index as i16, (column_index - 1) as i16, &mut current_number, &mut numbers);
         }
     }
-    Schematic { rows, numbers, symbols }
+    Schematic { numbers, symbols }
 }
 
 pub fn solution_part_1(schematic: &Schematic) -> u32 {

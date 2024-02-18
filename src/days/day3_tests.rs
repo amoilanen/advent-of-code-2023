@@ -9,10 +9,6 @@ fn test_parse() {
 ..34..";
     let result = day3::parse(input);
     assert_eq!(result, day3::Schematic {
-        rows: vec![
-            "12..*.".chars().collect(),
-            "..34..".chars().collect()
-        ],
         numbers: vec![
             SchematicNumber::new(12,Position::new(0, 0), Position::new(0, 1)),
             SchematicNumber::new(34, Position::new(1, 2), Position::new(1, 3)),
@@ -21,6 +17,24 @@ fn test_parse() {
             SchematicSymbol::new('*', Position::new(0, 4))
         ]
     })
+}
+
+#[test]
+fn test_parse_numbers_symbols_at_edges() {
+    let input: &str = "123.*
+    ..234
+    #....";
+        let result = day3::parse(input);
+        assert_eq!(result, day3::Schematic {
+            numbers: vec![
+                SchematicNumber::new(123,Position::new(0, 0), Position::new(0, 2)),
+                SchematicNumber::new(234, Position::new(1, 2), Position::new(1, 4)),
+            ],
+            symbols: vec![
+                SchematicSymbol::new('*', Position::new(0, 4)),
+                SchematicSymbol::new('#', Position::new(2, 0))
+            ]
+        })
 }
 
 #[test]
