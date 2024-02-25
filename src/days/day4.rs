@@ -19,6 +19,15 @@ impl Card {
     pub fn new(id: u16, winning_numbers: Vec<u16>, present_numbers: Vec<u16>) -> Card {
         Card {id, winning_numbers, present_numbers}
     }
+
+    pub fn points(&self) -> u16 {
+        let matches_number = self.present_numbers.iter().filter(|present_number| self.winning_numbers.contains(present_number)).count();
+        if matches_number > 0 {
+            2u16.pow(matches_number as u32 - 1)
+        } else {
+            0
+        }
+    }
 }
 
 fn parse_numbers(numbers_input: &str) -> Vec<u16> {

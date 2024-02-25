@@ -27,3 +27,33 @@ fn test_parse() {
         )
     ])
 }
+
+#[test]
+fn test_card_points_no_matches() {
+    let card = Card::new(
+        1,
+        vec![87, 83, 26, 28, 32],
+        vec![88, 30, 70, 12, 93, 22, 82, 36]
+    );
+    assert_eq![0, card.points()]
+}
+
+#[test]
+fn test_card_points_one_match() {
+    let card = Card::new(
+        1,
+        vec![41, 92, 73, 84, 69],
+        vec![59, 84, 76, 51, 58, 5, 54, 83]
+    );
+    assert_eq![1, card.points()]
+}
+
+#[test]
+fn test_card_points_three_matches() {
+    let card = Card::new(
+        1,
+        vec![41, 48, 83, 86, 17],
+        vec![83, 86, 6, 31, 17, 9, 48, 53]
+    );
+    assert_eq![8, card.points()]
+}
