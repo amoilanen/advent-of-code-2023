@@ -1,5 +1,5 @@
 use regex::Regex;
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
 pub const INPUT: &str = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
@@ -44,7 +44,6 @@ fn parse_numbers(numbers_input: &str) -> Vec<u16> {
         ).collect()
 }
 
-
 fn parse_line(line: &str) -> Card {
     let (card_info_input, numbers_input) = line.split_once(':').expect("Did not find a single separator :");
     let (winning_input, present_input) = numbers_input.split_once('|').expect("Did not find a single separator |");
@@ -73,6 +72,7 @@ fn get_full_card_counts(cards: &Vec<Card>) -> HashMap<u16, u32> {
     }
     let mut card_ids: Vec<u16> = card_id_to_card.keys().cloned().collect();
     card_ids.sort();
+
     let mut card_counts: HashMap<u16, u32> = HashMap::new();
     for card in cards {
         card_counts.insert(card.id, 1);
@@ -90,10 +90,5 @@ fn get_full_card_counts(cards: &Vec<Card>) -> HashMap<u16, u32> {
 }
 
 pub fn solution_part_2(cards: &Vec<Card>) -> u32 {
-    let card_counts: HashMap<u16, u32> = get_full_card_counts(&cards);
-    let mut total_card_count: u32 = 0;
-    for card in cards {
-         total_card_count = total_card_count + card_counts.get(&card.id).unwrap_or(&0);
-    }
-    total_card_count
+    get_full_card_counts(&cards).values().sum()
 }
