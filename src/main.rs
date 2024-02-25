@@ -19,7 +19,7 @@ fn main() {
     let day_3_input_parsed = day3::parse(day3::INPUT);
     println!("{:?}", day3::solution_part_1(&day_3_input_parsed));
     println!("{:?}", day3::solution_part_2(&day_3_input_parsed));
-    let day_4_input_parsed = day3::parse(day4::INPUT);
-    println!("{:?}", day3::solution_part_1(&day_4_input_parsed));
-    println!("{:?}", day3::solution_part_2(&day_4_input_parsed));
+    let day_4_input_parsed = day4::parse(day4::INPUT);
+    println!("{:?}", day4::solution_part_1(&day_4_input_parsed));
+    println!("{:?}", day4::solution_part_2(&day_4_input_parsed));
 }

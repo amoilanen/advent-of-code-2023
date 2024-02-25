@@ -57,3 +57,9 @@ fn test_card_points_three_matches() {
     );
     assert_eq![8, card.points()]
 }
+
+#[test]
+fn test_solution_part1() {
+    let parsed = day4::parse(day4::INPUT);
+    assert_eq!(day4::solution_part_1(&parsed), 13)
+}
