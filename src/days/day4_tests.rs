@@ -63,3 +63,9 @@ fn test_solution_part1() {
     let parsed = day4::parse(day4::INPUT);
     assert_eq!(day4::solution_part_1(&parsed), 13)
 }
+
+#[test]
+fn test_solution_part2() {
+    let parsed = day4::parse(day4::INPUT);
+    assert_eq!(day4::solution_part_2(&parsed), 30)
+}

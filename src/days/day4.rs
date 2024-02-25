@@ -1,4 +1,5 @@
 use regex::Regex;
+use std::{collections::HashMap, hash::Hash};
 
 pub const INPUT: &str = "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53
 Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19
@@ -20,8 +21,12 @@ impl Card {
         Card {id, winning_numbers, present_numbers}
     }
 
+    pub fn matches_number(&self) -> u16 {
+        self.present_numbers.iter().filter(|present_number| self.winning_numbers.contains(present_number)).count() as u16
+    }
+
     pub fn points(&self) -> u16 {
-        let matches_number = self.present_numbers.iter().filter(|present_number| self.winning_numbers.contains(present_number)).count();
+        let matches_number = self.matches_number();
         if matches_number > 0 {
             2u16.pow(matches_number as u32 - 1)
         } else {
@@ -57,10 +62,38 @@ pub fn parse(input: &str) -> Vec<Card> {
         .collect()
 }
 
-pub fn solution_part_1(input: &Vec<Card>) -> u16 {
-    input.iter().map(|card| card.points()).sum()
+pub fn solution_part_1(cards: &Vec<Card>) -> u16 {
+    cards.iter().map(|card| card.points()).sum()
 }
 
-pub fn solution_part_2(input: &Vec<Card>) -> u16 {
-    2
+fn get_full_card_counts(cards: &Vec<Card>) -> HashMap<u16, u32> {
+    let mut card_id_to_card: HashMap<u16, &Card> = HashMap::new();
+    for card in cards {
+        card_id_to_card.insert(card.id, &card);
+    }
+    let mut card_ids: Vec<u16> = card_id_to_card.keys().cloned().collect();
+    card_ids.sort();
+    let mut card_counts: HashMap<u16, u32> = HashMap::new();
+    for card in cards {
+        card_counts.insert(card.id, 1);
+    }
+    for card_id in card_ids {
+        let card = &card_id_to_card.get(&card_id).unwrap();
+        let current_card_matches = card.matches_number();
+        for subsequent_card_id in (card.id + 1)..=(card.id + current_card_matches) {
+            let current_card_count = (&card_counts).get(&card.id).unwrap_or(&0);
+            let updated_count = (&card_counts).get(&subsequent_card_id).unwrap_or(&0) + current_card_count;
+            card_counts.insert(subsequent_card_id, updated_count);
+        }
+    }
+    card_counts
+}
+
+pub fn solution_part_2(cards: &Vec<Card>) -> u32 {
+    let card_counts: HashMap<u16, u32> = get_full_card_counts(&cards);
+    let mut total_card_count: u32 = 0;
+    for card in cards {
+         total_card_count = total_card_count + card_counts.get(&card.id).unwrap_or(&0);
+    }
+    total_card_count
 }
