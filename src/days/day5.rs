@@ -135,7 +135,12 @@ pub fn get_conversions(input: u32, maps: &Vec<Map>) -> Vec<u32> {
 }
 
 pub fn solution_part_1(almanac: &Almanac) -> u32 {
-    1
+    let mut final_conversions: Vec<u32> = Vec::new();
+    for input in &almanac.inputs {
+        let input_conversions = get_conversions(*input, &almanac.maps);
+        final_conversions.push(input_conversions.last().unwrap().clone());
+    }
+    final_conversions.iter().min().unwrap().clone()
 }
 
 pub fn solution_part_2(almanac: &Almanac) -> u32 {

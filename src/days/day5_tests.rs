@@ -95,3 +95,9 @@ fn test_get_conversions() {
         vec![13, 13, 52, 41, 34, 34, 35, 35]
     )
 }
+
+#[test]
+fn test_solution_part1() {
+    let parsed = day5::parse(day5::INPUT);
+    assert_eq!(day5::solution_part_1(&parsed), 35)
+}
