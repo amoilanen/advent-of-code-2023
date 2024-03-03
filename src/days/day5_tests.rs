@@ -1,3 +1,4 @@
+use crate::day5::get_conversions;
 #[cfg(test)]
 use crate::days::day5;
 #[cfg(test)]
@@ -72,4 +73,25 @@ fn test_parse() {
             ])
         ]
     ))
+}
+
+#[test]
+fn test_get_conversions() {
+    let almanac = day5::parse(day5::INPUT);
+    assert_eq!(
+        get_conversions(79, &almanac.maps),
+        vec![79, 81, 81, 81, 74, 78, 78, 82]
+    );
+    assert_eq!(
+        get_conversions(14, &almanac.maps),
+        vec![14, 14, 53, 49, 42, 42, 43, 43]
+    );
+    assert_eq!(
+        get_conversions(55, &almanac.maps),
+        vec![55, 57, 57, 53, 46, 82, 82, 86]
+    );
+    assert_eq!(
+        get_conversions(13, &almanac.maps),
+        vec![13, 13, 52, 41, 34, 34, 35, 35]
+    )
 }

@@ -47,6 +47,13 @@ impl RangeRule {
     pub fn new(destination_start: u32, source_start: u32, range_length: u32) -> RangeRule {
         RangeRule {destination_start, source_start, range_length}
     }
+    pub fn convert(&self, input: u32) -> u32 {
+        if input >= self.source_start && input <= self.source_start + self.range_length - 1 {
+            self.destination_start + (input - self.source_start)
+        } else {
+            input
+        }
+    }
 }
 
 #[derive(PartialEq)]
@@ -56,6 +63,15 @@ pub struct Map {
 }
 
 impl Map {
+    pub fn convert(&self, input: u32) -> u32 {
+        for rule in &self.rules {
+            let converted_input = rule.convert(input);
+            if converted_input != input {
+                return converted_input
+            }
+        }
+        return input
+    }
     pub fn new(rules: Vec<RangeRule>) -> Map {
         Map {rules}
     }
@@ -106,6 +122,16 @@ pub fn parse(input: &str) -> Almanac {
         inputs,
         maps
     }
+}
+
+pub fn get_conversions(input: u32, maps: &Vec<Map>) -> Vec<u32> {
+    let mut current_value: u32 = input;
+    let mut conversions: Vec<u32> = vec![current_value];
+    for map in maps {
+        current_value = map.convert(current_value);
+        conversions.push(current_value);
+    }
+    conversions
 }
 
 pub fn solution_part_1(almanac: &Almanac) -> u32 {
