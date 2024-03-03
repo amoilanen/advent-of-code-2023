@@ -1,6 +1,5 @@
-use regex::Regex;
-use core::str::FromStr;
 use std::fmt::Debug;
+use crate::days::parsing;
 
 pub const INPUT: &str = "seeds: 79 14 55 13
 
@@ -75,22 +74,11 @@ impl Almanac {
     }
 }
 
-fn parse_numbers<T>(numbers_input: &str) -> Vec<T> where T: FromStr,<T as FromStr>::Err: Debug {
-    let whitespace_regex = Regex::new(r"\s+").unwrap();
-    whitespace_regex.split(numbers_input)
-        .filter(|numbers_input| !numbers_input.is_empty())
-        .map(|number_input|
-            number_input.parse().expect("Expected a number")
-        ).collect()
-}
-
 pub fn parse(input: &str) -> Almanac {
-    let lines: Vec<&str> = input.split_terminator('\n')
-        .map(|line| line.trim())
-        .collect();
-    
+    let lines: Vec<&str> = parsing::as_lines(input);
+
     let (_, inputs_input) = lines[0].split_once(':').expect("Did not find a single separator :");
-    let inputs: Vec<u32> = parse_numbers(inputs_input);
+    let inputs: Vec<u32> = parsing::parse_numbers(inputs_input);
 
     let mut maps: Vec<Map> = Vec::new();
     
@@ -104,7 +92,7 @@ pub fn parse(input: &str) -> Almanac {
         } else if line.find(':').is_some() {
             // Skip the mapping header
         } else {
-            let line_numbers: Vec<u32> = parse_numbers(line);
+            let line_numbers: Vec<u32> = parsing::parse_numbers(line);
             let (destination_start, source_start, range_length) = (line_numbers[0], line_numbers[1], line_numbers[2]);
             current_rules.push(RangeRule::new(destination_start, source_start, range_length));
         }

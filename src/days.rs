@@ -3,6 +3,7 @@ pub mod day2;
 pub mod day3;
 pub mod day4;
 pub mod day5;
+pub mod parsing;
 mod day1_tests;
 mod day2_tests;
 mod day3_tests;
