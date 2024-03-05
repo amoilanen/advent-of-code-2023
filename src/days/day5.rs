@@ -38,16 +38,16 @@ humidity-to-location map:
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub struct RangeRule {
-    pub destination_start: u32,
-    pub source_start: u32,
-    pub range_length: u32
+    pub destination_start: u64,
+    pub source_start: u64,
+    pub range_length: u64
 }
 
 impl RangeRule {
-    pub fn new(destination_start: u32, source_start: u32, range_length: u32) -> RangeRule {
+    pub fn new(destination_start: u64, source_start: u64, range_length: u64) -> RangeRule {
         RangeRule {destination_start, source_start, range_length}
     }
-    pub fn convert(&self, input: u32) -> u32 {
+    pub fn convert(&self, input: u64) -> u64 {
         if input >= self.source_start && input <= self.source_start + self.range_length - 1 {
             self.destination_start + (input - self.source_start)
         } else {
@@ -63,7 +63,7 @@ pub struct Map {
 }
 
 impl Map {
-    pub fn convert(&self, input: u32) -> u32 {
+    pub fn convert(&self, input: u64) -> u64 {
         for rule in &self.rules {
             let converted_input = rule.convert(input);
             if converted_input != input {
@@ -80,12 +80,12 @@ impl Map {
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub struct Almanac {
-    pub inputs: Vec<u32>,
+    pub inputs: Vec<u64>,
     pub maps: Vec<Map>
 }
 
 impl Almanac {
-    pub fn new(inputs: Vec<u32>, maps: Vec<Map>) -> Almanac {
+    pub fn new(inputs: Vec<u64>, maps: Vec<Map>) -> Almanac {
         Almanac {inputs, maps}
     }
 }
@@ -94,7 +94,7 @@ pub fn parse(input: &str) -> Almanac {
     let lines: Vec<&str> = parsing::as_lines(input);
 
     let (_, inputs_input) = lines[0].split_once(':').expect("Did not find a single separator :");
-    let inputs: Vec<u32> = parsing::parse_numbers(inputs_input);
+    let inputs: Vec<u64> = parsing::parse_numbers(inputs_input);
 
     let mut maps: Vec<Map> = Vec::new();
     
@@ -108,7 +108,7 @@ pub fn parse(input: &str) -> Almanac {
         } else if line.find(':').is_some() {
             // Skip the mapping header
         } else {
-            let line_numbers: Vec<u32> = parsing::parse_numbers(line);
+            let line_numbers: Vec<u64> = parsing::parse_numbers(line);
             let (destination_start, source_start, range_length) = (line_numbers[0], line_numbers[1], line_numbers[2]);
             current_rules.push(RangeRule::new(destination_start, source_start, range_length));
         }
@@ -124,9 +124,9 @@ pub fn parse(input: &str) -> Almanac {
     }
 }
 
-pub fn get_conversions(input: u32, maps: &Vec<Map>) -> Vec<u32> {
-    let mut current_value: u32 = input;
-    let mut conversions: Vec<u32> = vec![current_value];
+pub fn get_conversions(input: u64, maps: &Vec<Map>) -> Vec<u64> {
+    let mut current_value: u64 = input;
+    let mut conversions: Vec<u64> = vec![current_value];
     for map in maps {
         current_value = map.convert(current_value);
         conversions.push(current_value);
@@ -134,8 +134,8 @@ pub fn get_conversions(input: u32, maps: &Vec<Map>) -> Vec<u32> {
     conversions
 }
 
-pub fn solution_part_1(almanac: &Almanac) -> u32 {
-    let mut final_conversions: Vec<u32> = Vec::new();
+pub fn solution_part_1(almanac: &Almanac) -> u64 {
+    let mut final_conversions: Vec<u64> = Vec::new();
     for input in &almanac.inputs {
         let input_conversions = get_conversions(*input, &almanac.maps);
         final_conversions.push(input_conversions.last().unwrap().clone());
@@ -143,6 +143,6 @@ pub fn solution_part_1(almanac: &Almanac) -> u32 {
     final_conversions.iter().min().unwrap().clone()
 }
 
-pub fn solution_part_2(almanac: &Almanac) -> u32 {
+pub fn solution_part_2(almanac: &Almanac) -> u64 {
     1
 }
