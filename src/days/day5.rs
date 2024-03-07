@@ -1,4 +1,6 @@
 use std::fmt::Debug;
+use std::cmp::min;
+use std::cmp::max;
 use crate::days::parsing;
 
 pub const INPUT: &str = "seeds: 79 14 55 13
@@ -43,10 +45,44 @@ pub struct RangeRule {
     pub range_length: u64
 }
 
+#[derive(PartialEq)]
+#[derive(Debug)]
+pub struct Range {
+    pub start: u64,
+    pub end: u64
+}
+
+impl Range {
+    pub fn new(start: u64, end: u64) -> Range {
+        Range {start, end}
+    }
+}
+
 impl RangeRule {
     pub fn new(destination_start: u64, source_start: u64, range_length: u64) -> RangeRule {
         RangeRule {destination_start, source_start, range_length}
     }
+
+    // Returns a part of first converted range if any and second any remaining non-converted ranges
+    pub fn convert_range(&self, range: Range) -> (Vec<Range>, Vec<Range>) {
+        let source_end = self.source_start + self.range_length - 1;
+        let mut converted: Vec<Range> = Vec::new();
+        let mut remaining: Vec<Range> = Vec::new();
+        if range.start < self.source_start {
+            remaining.push(Range::new(range.start, min(range.end, self.source_start - 1)))
+        }
+        if range.end > source_end {
+            remaining.push(Range::new(max(range.start, source_end + 1), range.end))
+        }
+        let to_be_converted_start = max(range.start, self.source_start);
+        let to_be_converted_end = min(range.end, source_end);
+        if to_be_converted_start <= to_be_converted_end {
+            let converted_range = Range::new(self.convert(to_be_converted_start), self.convert(to_be_converted_end));
+            converted.push(converted_range);
+        }
+        (converted, remaining)
+    }
+
     pub fn convert(&self, input: u64) -> u64 {
         if input >= self.source_start && input <= self.source_start + self.range_length - 1 {
             self.destination_start + (input - self.source_start)

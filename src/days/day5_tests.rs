@@ -7,6 +7,8 @@ use crate::days::day5::Almanac;
 use crate::days::day5::Map;
 #[cfg(test)]
 use crate::days::day5::RangeRule;
+#[cfg(test)]
+use crate::days::day5::Range;
 
 #[test]
 fn test_parse() {
@@ -94,6 +96,23 @@ fn test_get_conversions() {
         get_conversions(13, &almanac.maps),
         vec![13, 13, 52, 41, 34, 34, 35, 35]
     )
+}
+
+#[test]
+fn range_rule_convert_range() {
+    let rule = RangeRule::new(20, 10, 5); // 10 11 12 13 14 -> 20 21 22 23 24
+    let range_left_of_rule = Range::new(4, 8);
+    assert_eq!(rule.convert_range(range_left_of_rule), (Vec::new(), vec![Range::new(4, 8)]));
+    let range_right_of_rule = Range::new(16, 18);
+    assert_eq!(rule.convert_range(range_right_of_rule), (Vec::new(), vec![Range::new(16, 18)]));
+    let range_intersecting_with_rule_from_left = Range::new(6, 12);
+    assert_eq!(rule.convert_range(range_intersecting_with_rule_from_left), (vec![Range::new(20, 22)], vec![Range::new(6, 9)]));
+    let range_intersecting_with_rule_from_right = Range::new(13, 18);
+    assert_eq!(rule.convert_range(range_intersecting_with_rule_from_right), (vec![Range::new(23, 24)], vec![Range::new(15, 18)]));
+    let range_subsuming_rule = Range::new(8, 18);
+    assert_eq!(rule.convert_range(range_subsuming_rule), (vec![Range::new(20, 24)], vec![Range::new(8, 9), Range::new(15, 18)]));
+    let range_subsumed_by_rule = Range::new(11, 13);
+    assert_eq!(rule.convert_range(range_subsumed_by_rule), (vec![Range::new(21, 23)], Vec::new()));
 }
 
 #[test]
