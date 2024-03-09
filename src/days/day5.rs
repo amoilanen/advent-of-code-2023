@@ -1,3 +1,4 @@
+use core::num;
 use std::fmt::Debug;
 use std::cmp::min;
 use std::cmp::max;
@@ -111,9 +112,9 @@ impl Map {
         }
         return input
     }
-    pub fn convert_range(&self, range: &Range) -> Vec<Range> {
+    pub fn convert_ranges(&self, ranges: &Vec<Range>) -> Vec<Range> {
         let mut converted: Vec<Range> = Vec::new();
-        let mut remaining: Vec<Range> = vec![range.clone()];
+        let mut remaining: Vec<Range> = ranges.clone();
         for rule in &self.rules {
             let mut updated_remaining: Vec<Range> = Vec::new();
             for remaining_range in remaining {
@@ -134,21 +135,43 @@ impl Map {
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub struct Almanac {
-    pub inputs: Vec<u64>,
+    pub inputs: Option<Vec<u64>>,
+    pub input_ranges: Option<Vec<Range>>,
     pub maps: Vec<Map>
 }
 
 impl Almanac {
-    pub fn new(inputs: Vec<u64>, maps: Vec<Map>) -> Almanac {
-        Almanac {inputs, maps}
+    pub fn new(inputs: Option<Vec<u64>>, input_ranges: Option<Vec<Range>>, maps: Vec<Map>) -> Almanac {
+        Almanac {inputs, input_ranges, maps}
     }
 }
 
-pub fn parse(input: &str) -> Almanac {
+pub fn parse_for_part_1(input: &str) -> Almanac {
+    parse(input,
+        |input| Some(parsing::parse_numbers(input)),
+        |input| None)
+}
+
+pub fn parse_for_part_2(input: &str) -> Almanac {
+    parse(input,
+        |input| None,
+        |input| {
+            let numbers: Vec<u64> = parsing::parse_numbers(input);
+            let mut input_ranges = Vec::new();
+            for idx in (0..numbers.len()).step_by(2) {
+                let range_start = numbers[idx];
+                let range_length = numbers[idx + 1];
+                input_ranges.push(Range::new(range_start, range_start + range_length - 1))
+            }
+            Some(input_ranges)
+        })
+}
+
+pub fn parse<F1, F2>(input: &str, parse_inputs: F1, parse_input_ranges: F2) -> Almanac 
+where F1: Fn(&str) -> Option<Vec<u64>>, F2: Fn(&str) -> Option<Vec<Range>> {
     let lines: Vec<&str> = parsing::as_lines(input);
 
     let (_, inputs_input) = lines[0].split_once(':').expect("Did not find a single separator :");
-    let inputs: Vec<u64> = parsing::parse_numbers(inputs_input);
 
     let mut maps: Vec<Map> = Vec::new();
     
@@ -173,7 +196,8 @@ pub fn parse(input: &str) -> Almanac {
         current_rules = Vec::new();
     }
     Almanac {
-        inputs,
+        inputs: parse_inputs(&inputs_input),
+        input_ranges: parse_input_ranges(&inputs_input),
         maps
     }
 }
@@ -190,9 +214,11 @@ pub fn get_conversions(input: u64, maps: &Vec<Map>) -> Vec<u64> {
 
 pub fn solution_part_1(almanac: &Almanac) -> u64 {
     let mut final_conversions: Vec<u64> = Vec::new();
-    for input in &almanac.inputs {
-        let input_conversions = get_conversions(*input, &almanac.maps);
-        final_conversions.push(input_conversions.last().unwrap().clone());
+    if let Some(inputs) = almanac.inputs.clone() {
+        for input in inputs {
+            let input_conversions = get_conversions(input, &almanac.maps);
+            final_conversions.push(input_conversions.last().unwrap().clone());
+        }
     }
     final_conversions.iter().min().unwrap().clone()
 }

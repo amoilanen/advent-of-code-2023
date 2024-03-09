@@ -13,7 +13,7 @@ use crate::days::day5::Range;
 use std::collections::HashSet;
 
 #[test]
-fn test_parse() {
+fn test_parse_for_part_1() {
     let input: &str = "seeds: 79 14 55 13
 
     seed-to-soil map:
@@ -43,9 +43,10 @@ fn test_parse() {
     temperature-to-humidity map:
     0 69 1
     1 0 69";
-    let parsed = day5::parse(input);
+    let parsed = day5::parse_for_part_1(input);
     assert_eq!(parsed, Almanac::new(
-        vec![79, 14, 55, 13],
+        Some(vec![79, 14, 55, 13]),
+        None,
         vec![
             Map::new(vec![
                 RangeRule::new(50, 98, 2),
@@ -81,7 +82,7 @@ fn test_parse() {
 
 #[test]
 fn test_get_conversions() {
-    let almanac = day5::parse(day5::INPUT);
+    let almanac = day5::parse_for_part_1(day5::INPUT);
     assert_eq!(
         get_conversions(79, &almanac.maps),
         vec![79, 81, 81, 81, 74, 78, 78, 82]
@@ -132,12 +133,80 @@ fn map_convert_range() {
         Range::new(40, 41),
         Range::new(16, 20)
     ];
-    let result: HashSet<Range> = HashSet::from_iter(map.convert_range(&range));
+    let result: HashSet<Range> = HashSet::from_iter(map.convert_ranges(&vec![range]));
     assert_eq![result, HashSet::from(expected)];
 }
 
 #[test]
+fn test_parse_for_part_2() {
+    let input: &str = "seeds: 79 14 55 13
+
+    seed-to-soil map:
+    50 98 2
+    52 50 48
+    
+    soil-to-fertilizer map:
+    0 15 37
+    37 52 2
+    39 0 15
+    
+    fertilizer-to-water map:
+    49 53 8
+    0 11 42
+    42 0 7
+    57 7 4
+    
+    water-to-light map:
+    88 18 7
+    18 25 70
+    
+    light-to-temperature map:
+    45 77 23
+    81 45 19
+    68 64 13
+    
+    temperature-to-humidity map:
+    0 69 1
+    1 0 69";
+    let parsed = day5::parse_for_part_2(input);
+    assert_eq!(parsed, Almanac::new(
+        None,
+        Some(vec![Range::new(79, 92), Range::new(55, 67)]),
+        vec![
+            Map::new(vec![
+                RangeRule::new(50, 98, 2),
+                RangeRule::new(52, 50, 48)
+            ]),
+            Map::new(vec![
+                RangeRule::new(0, 15, 37),
+                RangeRule::new(37, 52, 2),
+                RangeRule::new(39, 0, 15)
+            ]),
+            Map::new(vec![
+                RangeRule::new(49, 53, 8),
+                RangeRule::new(0, 11, 42),
+                RangeRule::new(42, 0, 7),
+                RangeRule::new(57, 7, 4)
+            ]),
+            Map::new(vec![
+                RangeRule::new(88, 18, 7),
+                RangeRule::new(18, 25, 70)
+            ]),
+            Map::new(vec![
+                RangeRule::new(45, 77, 23),
+                RangeRule::new(81, 45, 19),
+                RangeRule::new(68, 64, 13)
+            ]),
+            Map::new(vec![
+                RangeRule::new(0, 69, 1),
+                RangeRule::new(1, 0, 69)
+            ])
+        ]
+    ))
+}
+
+#[test]
 fn test_solution_part1() {
-    let parsed = day5::parse(day5::INPUT);
+    let parsed = day5::parse_for_part_1(day5::INPUT);
     assert_eq!(day5::solution_part_1(&parsed), 35)
 }
