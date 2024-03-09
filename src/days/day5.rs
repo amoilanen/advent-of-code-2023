@@ -212,6 +212,14 @@ pub fn get_conversions(input: u64, maps: &Vec<Map>) -> Vec<u64> {
     conversions
 }
 
+pub fn get_range_conversions(ranges: &Vec<Range>, maps: &Vec<Map>) -> Vec<Range> {
+    let mut conversions: Vec<Range> = ranges.clone();
+    for map in maps {
+        conversions = map.convert_ranges(&conversions);
+    }
+    conversions
+}
+
 pub fn solution_part_1(almanac: &Almanac) -> u64 {
     let mut final_conversions: Vec<u64> = Vec::new();
     if let Some(inputs) = almanac.inputs.clone() {
@@ -224,5 +232,10 @@ pub fn solution_part_1(almanac: &Almanac) -> u64 {
 }
 
 pub fn solution_part_2(almanac: &Almanac) -> u64 {
-    1
+    let mut result: u64 = 0;
+    if let Some(input_ranges) = almanac.input_ranges.clone() {
+        let final_conversions = get_range_conversions(&input_ranges, &almanac.maps);
+        result = final_conversions.iter().map(|range| range.start).min().unwrap()
+    }
+    result
 }

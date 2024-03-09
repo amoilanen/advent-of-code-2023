@@ -210,3 +210,9 @@ fn test_solution_part1() {
     let parsed = day5::parse_for_part_1(day5::INPUT);
     assert_eq!(day5::solution_part_1(&parsed), 35)
 }
+
+#[test]
+fn test_solution_part2() {
+    let parsed = day5::parse_for_part_2(day5::INPUT);
+    assert_eq!(day5::solution_part_2(&parsed), 46)
+}
