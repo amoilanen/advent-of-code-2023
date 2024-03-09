@@ -47,6 +47,9 @@ pub struct RangeRule {
 
 #[derive(PartialEq)]
 #[derive(Debug)]
+#[derive(Hash)]
+#[derive(Eq)]
+#[derive(Clone)]
 pub struct Range {
     pub start: u64,
     pub end: u64
@@ -64,7 +67,7 @@ impl RangeRule {
     }
 
     // Returns a part of first converted range if any and second any remaining non-converted ranges
-    pub fn convert_range(&self, range: Range) -> (Vec<Range>, Vec<Range>) {
+    pub fn convert_range(&self, range: &Range) -> (Vec<Range>, Vec<Range>) {
         let source_end = self.source_start + self.range_length - 1;
         let mut converted: Vec<Range> = Vec::new();
         let mut remaining: Vec<Range> = Vec::new();
@@ -107,6 +110,21 @@ impl Map {
             }
         }
         return input
+    }
+    pub fn convert_range(&self, range: &Range) -> Vec<Range> {
+        let mut converted: Vec<Range> = Vec::new();
+        let mut remaining: Vec<Range> = vec![range.clone()];
+        for rule in &self.rules {
+            let mut updated_remaining: Vec<Range> = Vec::new();
+            for remaining_range in remaining {
+                let (mut next_converted, mut next_remaining) = rule.convert_range(&remaining_range);
+                updated_remaining.append(&mut next_remaining);
+                converted.append(&mut next_converted);
+            }
+            remaining = updated_remaining;
+        }
+        converted.append(&mut remaining);
+        converted
     }
     pub fn new(rules: Vec<RangeRule>) -> Map {
         Map {rules}
