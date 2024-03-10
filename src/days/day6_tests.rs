@@ -15,3 +15,9 @@ fn test_parse() {
         RaceRecord::new(30, 200)
     ])
 }
+
+#[test]
+fn test_solution_part1() {
+    let parsed = day6::parse(day6::INPUT);
+    assert_eq!(day6::solution_part_1(&parsed), 288)
+}

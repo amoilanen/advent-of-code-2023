@@ -29,10 +29,23 @@ pub fn parse(input: &str) -> Vec<RaceRecord> {
     times.iter().zip(distances.iter()).map(|(time, distance)| RaceRecord::new(*time, *distance)).collect()
 }
 
-pub fn solution_part_1(input: &Vec<RaceRecord>) -> u64 {
-    1
+fn number_of_ways_to_win(record: &RaceRecord) -> u16 {
+    let mut ways_to_win_count: u16 = 0;
+    for wait_time in 1..record.total_time {
+        let speed = wait_time;
+        let moving_time = record.total_time - wait_time;
+        if speed * moving_time > record.best_distance {
+            ways_to_win_count = ways_to_win_count + 1;
+        }
+    }
+    ways_to_win_count
 }
 
-pub fn solution_part_2(almanac: &Vec<RaceRecord>) -> u64 {
+pub fn solution_part_1(input: &Vec<RaceRecord>) -> u64 {
+    let number_of_ways_to_win = input.iter().map(|race_record| number_of_ways_to_win(&race_record) as u64);
+    number_of_ways_to_win.fold(1, |acc, element| acc * element)
+}
+
+pub fn solution_part_2(input: &Vec<RaceRecord>) -> u64 {
     1
 }
