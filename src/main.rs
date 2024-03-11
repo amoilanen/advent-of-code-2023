@@ -31,7 +31,8 @@ fn main() {
     let day_5_part_2_input_parsed = day5::parse_for_part_2(day5::INPUT);
     println!("{:?}", day5::solution_part_2(&day_5_part_2_input_parsed));
     println!("Day 6:");
-    let day_6_input_parsed = day6::parse(day6::INPUT);
-    println!("{:?}", day6::solution_part_1(&day_6_input_parsed));
-    println!("{:?}", day6::solution_part_2(&day_6_input_parsed));
+    let day_6_part_1_input_parsed = day6::parse_input_for_part_1(day6::INPUT);
+    println!("{:?}", day6::solution_part_1(&day_6_part_1_input_parsed));
+    let day_6_part_2_input_parsed = day6::parse_input_for_part_2(day6::INPUT);
+    println!("{:?}", day6::solution_part_2(&day_6_part_2_input_parsed));
 }

@@ -16,7 +16,7 @@ impl RaceRecord {
     }
 }
 
-pub fn parse(input: &str) -> Vec<RaceRecord> {
+pub fn parse_input_for_part_1(input: &str) -> Vec<RaceRecord> {
     let lines = parsing::as_lines(input);
     if lines.len() < 2 {
         println!("Expected to parse two lines of input, but found {:?}", lines);
@@ -27,6 +27,19 @@ pub fn parse(input: &str) -> Vec<RaceRecord> {
     let (_, distances_input) = lines[1].split_once(':').expect("Did not find a single separator :");
     let distances: Vec<u64> = parsing::parse_numbers(distances_input);
     times.iter().zip(distances.iter()).map(|(time, distance)| RaceRecord::new(*time, *distance)).collect()
+}
+
+pub fn parse_input_for_part_2(input: &str) -> RaceRecord {
+    let lines = parsing::as_lines(input);
+    if lines.len() < 2 {
+        println!("Expected to parse two lines of input, but found {:?}", lines);
+        return RaceRecord::new(0, 0)
+    }
+    let (_, time_input) = lines[0].split_once(':').expect("Did not find a single separator :");
+    let (_, distance_input) = lines[1].split_once(':').expect("Did not find a single separator :");
+    let time: u64 = time_input.replace(" ", "").parse().unwrap();
+    let distance: u64 = distance_input.replace(" ", "").parse().unwrap();
+    RaceRecord::new(time, distance)
 }
 
 pub fn number_of_ways_to_win(record: &RaceRecord) -> u64 {
@@ -81,10 +94,9 @@ pub fn smart_number_of_ways_to_win(record: &RaceRecord) -> u64 {
 
 pub fn solution_part_1(input: &Vec<RaceRecord>) -> u64 {
     let number_of_ways_to_win: Vec<u64> = input.iter().map(|race_record| smart_number_of_ways_to_win(&race_record) as u64).collect();
-    println!("Number of ways to win = {:?}", number_of_ways_to_win);
     number_of_ways_to_win.iter().fold(1, |acc, element| acc * element)
 }
 
-pub fn solution_part_2(input: &Vec<RaceRecord>) -> u64 {
-    1
+pub fn solution_part_2(input: &RaceRecord) -> u64 {
+    smart_number_of_ways_to_win(input)
 }
