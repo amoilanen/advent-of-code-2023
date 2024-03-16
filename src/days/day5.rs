@@ -148,12 +148,12 @@ impl Almanac {
 pub fn parse_for_part_1(input: &str) -> Almanac {
     parse(input,
         |input| Some(parsing::parse_numbers(input)),
-        |input| None)
+        |_| None)
 }
 
 pub fn parse_for_part_2(input: &str) -> Almanac {
     parse(input,
-        |input| None,
+        |_| None,
         |input| {
             let numbers: Vec<u64> = parsing::parse_numbers(input);
             let mut input_ranges = Vec::new();
@@ -192,7 +192,6 @@ where F1: Fn(&str) -> Option<Vec<u64>>, F2: Fn(&str) -> Option<Vec<Range>> {
     if !current_rules.is_empty() {
         let map = Map::new(current_rules);
         maps.push(map);
-        current_rules = Vec::new();
     }
     Almanac {
         inputs: parse_inputs(&inputs_input),

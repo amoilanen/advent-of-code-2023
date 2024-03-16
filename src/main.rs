@@ -6,6 +6,7 @@ pub use crate::days::day3;
 pub use crate::days::day4;
 pub use crate::days::day5;
 pub use crate::days::day6;
+pub use crate::days::day7;
 
 fn main() {
     println!("Day 1:");
@@ -35,4 +36,8 @@ fn main() {
     println!("{:?}", day6::solution_part_1(&day_6_part_1_input_parsed));
     let day_6_part_2_input_parsed = day6::parse_input_for_part_2(day6::INPUT).unwrap();
     println!("{:?}", day6::solution_part_2(&day_6_part_2_input_parsed));
+    println!("Day 7:");
+    let day_7_input_parsed = day7::parse(day7::INPUT);
+    println!("{:?}", day7::solution_part_1(&day_7_input_parsed));
+    println!("{:?}", day7::solution_part_2(&day_7_input_parsed));
 }

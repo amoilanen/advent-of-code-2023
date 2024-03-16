@@ -1,3 +1,4 @@
+#[cfg(test)]
 use crate::day5::get_conversions;
 #[cfg(test)]
 use crate::days::day5;
