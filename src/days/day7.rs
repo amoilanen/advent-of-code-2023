@@ -47,7 +47,7 @@ impl Ord for Card {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd)]
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd)]
 pub enum HandType {
     FiveOfAKind,
     FourOfAKind,
@@ -80,7 +80,7 @@ impl Ord for HandType {
     }
 }
 
-#[derive(PartialEq, PartialOrd, Eq, Debug)]
+#[derive(Clone, PartialEq, PartialOrd, Eq, Debug)]
 pub struct Hand {
     pub cards: [Card; 5],
     pub hand_type: HandType
@@ -89,6 +89,10 @@ pub struct Hand {
 impl Hand {
     pub fn new(cards: [Card; 5], hand_type: HandType) -> Hand {
         Hand { cards, hand_type }
+    }
+
+    pub fn as_string(&self) -> String {
+      self.cards.map(|c| c.value.to_string()).concat()
     }
 }
 
@@ -104,7 +108,7 @@ impl Ord for Hand {
     }
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Debug)]
 pub struct Bid {
     pub hand: Hand,
     pub amount: u16
@@ -113,6 +117,12 @@ pub struct Bid {
 impl Bid {
     pub fn new(hand: Hand, amount: u16) -> Bid {
         Bid { hand, amount }
+    }
+}
+
+impl Ord for Bid {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.hand.cmp(&other.hand)
     }
 }
 
@@ -175,8 +185,9 @@ pub fn parse(input: &str) -> Vec<Bid> {
 }
 
 pub fn solution_part_1(input: &Vec<Bid>) -> u64 {
-    //TODO: Implement
-    1
+    let mut bids = input.clone();
+    bids.sort_by(|x, y| x.cmp(y));
+    (1..=bids.len()).zip(bids).map(|(rank, bid)| (rank as u64) * (bid.amount as u64)).sum()
 }
 
 pub fn solution_part_2(input: &Vec<Bid>) -> u64 {

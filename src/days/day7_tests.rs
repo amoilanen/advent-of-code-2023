@@ -50,3 +50,18 @@ fn test_compare_hands() {
         Ordering::Less
     );
 }
+
+#[test]
+fn test_sorting_of_hands() {
+    let mut hands: Vec<Hand> = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"]
+        .iter().map(|hand_input| day7::parse_hand(hand_input)).collect();
+    hands.sort_by(|x, y| x.cmp(y));
+    let result: Vec<String> = hands.iter().map(|hand| hand.as_string()).collect();
+    assert_eq!(result, ["32T3K", "KTJJT", "KK677", "T55J5", "QQQJA"])
+}
+
+#[test]
+fn test_solution_part_1() {
+    let parsed = day7::parse(day7::INPUT);
+    assert_eq!(day7::solution_part_1(&parsed), 6440)
+}
