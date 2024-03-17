@@ -2,6 +2,8 @@
 use crate::days::day7;
 #[cfg(test)]
 use crate::days::day7::{ Bid, Card, Hand, HandType };
+#[cfg(test)]
+use std::cmp::Ordering;
 
 #[test]
 fn test_parse_input() {
@@ -19,4 +21,32 @@ fn test_parse_input() {
         Bid::new(Hand::new([ Card::new('K'), Card::new('T'), Card::new('J'), Card::new('J'), Card::new('T') ], HandType::TwoPair), 220),
         Bid::new(Hand::new([ Card::new('Q'), Card::new('Q'), Card::new('Q'), Card::new('J'), Card::new('A') ], HandType::ThreeOfAKind), 483)
     ])
+}
+
+#[test]
+fn test_compare_hands() {
+    assert_eq!(
+        day7::parse_hand("T55J5").cmp(&day7::parse_hand("QQQJA")),
+        Ordering::Less
+    );
+    assert_eq!(
+        day7::parse_hand("32T3K").cmp(&day7::parse_hand("KK677")),
+        Ordering::Less
+    );
+    assert_eq!(
+        day7::parse_hand("KK677").cmp(&day7::parse_hand("32T3K")),
+        Ordering::Greater
+    );
+    assert_eq!(
+        day7::parse_hand("KTJJT").cmp(&day7::parse_hand("KTJJT")),
+        Ordering::Equal
+    );
+    assert_eq!(
+        day7::parse_hand("KK677").cmp(&day7::parse_hand("KTJJT")),
+        Ordering::Greater
+    );
+    assert_eq!(
+        day7::parse_hand("KTJJT").cmp(&day7::parse_hand("KK677")),
+        Ordering::Less
+    );
 }

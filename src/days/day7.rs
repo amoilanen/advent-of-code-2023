@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::hash::Hash;
+use std::cmp::Ordering;
 
 use crate::days::parsing;
 
@@ -9,12 +10,7 @@ KK677 28
 KTJJT 220
 QQQJA 483";
 
-#[derive(Eq)]
-#[derive(Hash)]
-#[derive(PartialEq)]
-#[derive(Debug)]
-#[derive(Clone)]
-#[derive(Copy)]
+#[derive(Eq, Hash, PartialOrd, PartialEq, Debug, Clone, Copy)]
 pub struct Card {
     pub value: char
 }
@@ -22,8 +18,6 @@ pub struct Card {
 impl Card {
     pub fn rank(&self) -> u16 {
         match self.value {
-            '0' => 0,
-            '1' => 1,
             '2' => 2,
             '3' => 3,
             '4' => 4,
@@ -32,11 +26,11 @@ impl Card {
             '7' => 7,
             '8' => 8,
             '9' => 9,
-            'A' => 10,
-            'K' => 11,
+            'T' => 10,
+            'J' => 11,
             'Q' => 12,
-            'J' => 13,
-            'T' => 14,
+            'K' => 13,
+            'A' => 14,
             _ => 15
         }
     }
@@ -45,8 +39,15 @@ impl Card {
     }
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+impl Ord for Card {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let own_rank = self.rank();
+        let other_rank = other.rank();
+        own_rank.cmp(&other_rank)
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd)]
 pub enum HandType {
     FiveOfAKind,
     FourOfAKind,
@@ -71,26 +72,39 @@ impl HandType {
     }
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+impl Ord for HandType {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let own_rank = self.rank();
+        let other_rank = other.rank();
+        own_rank.cmp(&other_rank)
+    }
+}
+
+#[derive(PartialEq, PartialOrd, Eq, Debug)]
 pub struct Hand {
     pub cards: [Card; 5],
     pub hand_type: HandType
 }
 
 impl Hand {
-    pub fn compare(&self, other: &Card) -> u8 {
-        //TODO: Compare the hand type by rank and then invididual cards by rank if hand type ranks match
-        return 1
-    }
-
     pub fn new(cards: [Card; 5], hand_type: HandType) -> Hand {
         Hand { cards, hand_type }
     }
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+impl Ord for Hand {
+    fn cmp(&self, other: &Self) -> Ordering {
+        let hand_type_comparison = self.hand_type.cmp(&other.hand_type);
+        if hand_type_comparison != Ordering::Equal {
+            hand_type_comparison
+        } else {
+            let card_comparison_result = self.cards.cmp(&other.cards);
+            card_comparison_result
+        }
+    }
+}
+
+#[derive(PartialEq, Debug)]
 pub struct Bid {
     pub hand: Hand,
     pub amount: u16
@@ -137,13 +151,22 @@ fn determine_hand_type(cards: &[Card; 5]) -> HandType {
     }
 }
 
-fn parse_line(line: &str) -> Bid {
-    let (cards_input, bid_input) = line.split_once(' ').expect("Did not find a single separator :");
-    let bid_amount: u16 = bid_input.trim().parse().unwrap();
+fn parse_hand_cards(cards_input: &str) -> [Card; 5] {
     let cards: Vec<Card> = cards_input.chars().map(|card| Card::new(card)).collect();
     let hand_cards: [Card; 5] = cards.try_into().unwrap();
+    hand_cards
+}
+
+pub fn parse_hand(cards_input: &str) -> Hand {
+    let hand_cards: [Card; 5] = parse_hand_cards(cards_input);
     let hand_type = determine_hand_type(&hand_cards);
-    let hand: Hand = Hand::new(hand_cards, hand_type);
+    Hand::new(hand_cards, hand_type)
+}
+
+fn parse_line(line: &str) -> Bid {
+    let (cards_input, bid_input) = line.split_once(' ').expect("Did not find a single separator :");
+    let hand: Hand = parse_hand(cards_input);
+    let bid_amount: u16 = bid_input.trim().parse().unwrap();
     Bid::new(hand, bid_amount)
 }
 
