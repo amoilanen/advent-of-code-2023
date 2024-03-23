@@ -26,27 +26,27 @@ fn test_parse_input() {
 #[test]
 fn test_compare_hands() {
     assert_eq!(
-        day7::parse_hand("T55J5").cmp(&day7::parse_hand("QQQJA")),
+        day7::parse_hand("T55J5").cmp_part_1(&day7::parse_hand("QQQJA")),
         Ordering::Less
     );
     assert_eq!(
-        day7::parse_hand("32T3K").cmp(&day7::parse_hand("KK677")),
+        day7::parse_hand("32T3K").cmp_part_1(&day7::parse_hand("KK677")),
         Ordering::Less
     );
     assert_eq!(
-        day7::parse_hand("KK677").cmp(&day7::parse_hand("32T3K")),
+        day7::parse_hand("KK677").cmp_part_1(&day7::parse_hand("32T3K")),
         Ordering::Greater
     );
     assert_eq!(
-        day7::parse_hand("KTJJT").cmp(&day7::parse_hand("KTJJT")),
+        day7::parse_hand("KTJJT").cmp_part_1(&day7::parse_hand("KTJJT")),
         Ordering::Equal
     );
     assert_eq!(
-        day7::parse_hand("KK677").cmp(&day7::parse_hand("KTJJT")),
+        day7::parse_hand("KK677").cmp_part_1(&day7::parse_hand("KTJJT")),
         Ordering::Greater
     );
     assert_eq!(
-        day7::parse_hand("KTJJT").cmp(&day7::parse_hand("KK677")),
+        day7::parse_hand("KTJJT").cmp_part_1(&day7::parse_hand("KK677")),
         Ordering::Less
     );
 }
@@ -55,7 +55,7 @@ fn test_compare_hands() {
 fn test_sorting_of_hands() {
     let mut hands: Vec<Hand> = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"]
         .iter().map(|hand_input| day7::parse_hand(hand_input)).collect();
-    hands.sort_by(|x, y| x.cmp(y));
+    hands.sort_by(|x, y| x.cmp_part_1(y));
     let result: Vec<String> = hands.iter().map(|hand| hand.as_string()).collect();
     assert_eq!(result, ["32T3K", "KTJJT", "KK677", "T55J5", "QQQJA"])
 }

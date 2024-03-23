@@ -3,6 +3,7 @@ use std::hash::Hash;
 use std::cmp::Ordering;
 
 use crate::days::parsing;
+use crate::days::compare;
 
 pub const INPUT: &str = "32T3K 765
 T55J5 684
@@ -16,7 +17,7 @@ pub struct Card {
 }
 
 impl Card {
-    pub fn rank(&self) -> u16 {
+    pub fn rank_part_1(&self) -> u16 {
         match self.value {
             '2' => 2,
             '3' => 3,
@@ -34,16 +35,36 @@ impl Card {
             _ => 15
         }
     }
+    pub fn rank_part_2(&self) -> u16 {
+        match self.value {
+            'J' => 2,
+            '2' => 3,
+            '3' => 4,
+            '4' => 5,
+            '5' => 6,
+            '6' => 7,
+            '7' => 8,
+            '8' => 9,
+            '9' => 10,
+            'T' => 11,
+            'Q' => 12,
+            'K' => 13,
+            'A' => 14,
+            _ => 15
+        }
+    }
     pub fn new(value: char) -> Card {
         Card { value }
     }
-}
-
-impl Ord for Card {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let own_rank = self.rank();
-        let other_rank = other.rank();
-        own_rank.cmp(&other_rank)
+    fn cmp_part_1(first: &Self, second: &Self) -> Ordering {
+        let first_rank = first.rank_part_1();
+        let second_rank: u16 = second.rank_part_1();
+        first_rank.cmp(&second_rank)
+    }
+    fn cmp_part_2(first: &Self, second: &Self) -> Ordering {
+        let first_rank = first.rank_part_2();
+        let second_rank: u16 = second.rank_part_2();
+        first_rank.cmp(&second_rank)
     }
 }
 
@@ -83,26 +104,25 @@ impl Ord for HandType {
 #[derive(Clone, PartialEq, PartialOrd, Eq, Debug)]
 pub struct Hand {
     pub cards: [Card; 5],
-    pub hand_type: HandType
+    pub hand_type_part_1: HandType,
+    pub hand_type_part_2: HandType
 }
 
 impl Hand {
     pub fn new(cards: [Card; 5], hand_type: HandType) -> Hand {
-        Hand { cards, hand_type }
+        Hand { cards, hand_type_part_1: hand_type.clone(), hand_type_part_2: hand_type } //TODO: Determine the real hand type for part 2
     }
 
     pub fn as_string(&self) -> String {
       self.cards.map(|c| c.value.to_string()).concat()
     }
-}
 
-impl Ord for Hand {
-    fn cmp(&self, other: &Self) -> Ordering {
-        let hand_type_comparison = self.hand_type.cmp(&other.hand_type);
+    pub fn cmp_part_1(&self, other: &Self) -> Ordering {
+        let hand_type_comparison = self.hand_type_part_1.cmp(&other.hand_type_part_1);
         if hand_type_comparison != Ordering::Equal {
             hand_type_comparison
         } else {
-            let card_comparison_result = self.cards.cmp(&other.cards);
+            let card_comparison_result = compare::compare_arrays(&self.cards, &other.cards, Card::cmp_part_1);
             card_comparison_result
         }
     }
@@ -118,11 +138,8 @@ impl Bid {
     pub fn new(hand: Hand, amount: u16) -> Bid {
         Bid { hand, amount }
     }
-}
-
-impl Ord for Bid {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.hand.cmp(&other.hand)
+    fn cmp_part_1(&self, other: &Self) -> Ordering {
+        self.hand.cmp_part_1(&other.hand)
     }
 }
 
@@ -186,7 +203,7 @@ pub fn parse(input: &str) -> Vec<Bid> {
 
 pub fn solution_part_1(input: &Vec<Bid>) -> u64 {
     let mut bids = input.clone();
-    bids.sort_by(|x, y| x.cmp(y));
+    bids.sort_by(|x, y| x.cmp_part_1(y));
     (1..=bids.len()).zip(bids).map(|(rank, bid)| (rank as u64) * (bid.amount as u64)).sum()
 }
 
