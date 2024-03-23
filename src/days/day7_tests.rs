@@ -52,6 +52,106 @@ fn test_compare_hands() {
 }
 
 #[test]
+fn test_determine_hand_type_part_1() {
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("AAAAA")),
+        HandType::FiveOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("AA8AA")),
+        HandType::FourOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("23332")),
+        HandType::FullHouse
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("TTT98")),
+        HandType::ThreeOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("23432")),
+        HandType::TwoPair
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("A23A4")),
+        HandType::OnePair
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_1(&day7::parse_hand_cards("23456")),
+        HandType::HighCard
+    );
+}
+
+#[test]
+fn test_determine_hand_type_part_2() {
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("AAAAA")),
+        HandType::FiveOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("AA8AA")),
+        HandType::FourOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("23332")),
+        HandType::FullHouse
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("TTT98")),
+        HandType::ThreeOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("23432")),
+        HandType::TwoPair
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("A23A4")),
+        HandType::OnePair
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("23456")),
+        HandType::HighCard
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("AJAJA")),
+        HandType::FiveOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("AA8JA")),
+        HandType::FourOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("J33J2")),
+        HandType::FourOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("233J2")),
+        HandType::FullHouse
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("TJT98")),
+        HandType::ThreeOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("TJJ98")),
+        HandType::ThreeOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("234J2")),
+        HandType::ThreeOfAKind
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("A23J4")),
+        HandType::OnePair
+    );
+    assert_eq!(
+        day7::determine_hand_type_part_2(&day7::parse_hand_cards("JJJJJ")),
+        HandType::FiveOfAKind
+    );
+}
+
+#[test]
 fn test_sorting_of_hands() {
     let mut hands: Vec<Hand> = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"]
         .iter().map(|hand_input| day7::parse_hand(hand_input)).collect();
