@@ -109,8 +109,8 @@ pub struct Hand {
 }
 
 impl Hand {
-    pub fn new(cards: [Card; 5], hand_type: HandType) -> Hand {
-        Hand { cards, hand_type_part_1: hand_type.clone(), hand_type_part_2: hand_type } //TODO: Determine the real hand type for part 2
+    pub fn new(cards: [Card; 5], hand_type_part_1: HandType, hand_type_part_2: HandType) -> Hand {
+        Hand { cards, hand_type_part_1, hand_type_part_2 }
     }
 
     pub fn as_string(&self) -> String {
@@ -154,43 +154,29 @@ where T: Eq, T: Hash, T: Copy {
 }
 
 pub fn determine_hand_type_part_1(cards: &[Card; 5]) -> HandType {
-    let card_counts_hash = counts(&cards.to_vec());
-    let card_counts: Vec<&u16> = card_counts_hash.values().collect();
-    let count_counts = counts(&card_counts);
-    let five_counts = *count_counts.get(&5).unwrap_or(&0);
-    let four_counts = *count_counts.get(&4).unwrap_or(&0);
-    let three_counts = *count_counts.get(&3).unwrap_or(&0);
-    let two_counts = *count_counts.get(&2).unwrap_or(&0);
-    if five_counts == 1 {
-        HandType::FiveOfAKind
-    } else if four_counts == 1 {
-        HandType::FourOfAKind
-    } else if three_counts == 1 && two_counts == 1 {
-        HandType::FullHouse
-    } else if three_counts == 1 {
-        HandType::ThreeOfAKind
-    } else if two_counts == 2 {
-        HandType::TwoPair
-    } else if two_counts == 1 {
-        HandType::OnePair
-    } else {
-        HandType::HighCard
-    }
+    determine_hand_type(cards, &Card::new('?'))
 }
 
 pub fn determine_hand_type_part_2(cards: &[Card; 5]) -> HandType {
+    determine_hand_type(cards, &Card::new('J'))
+}
+
+fn get_card_counts(cards: &[Card; 5], joker_card: &Card) -> HashMap<Card, u16> {
     let mut card_counts_hash = counts(&cards.to_vec());
-    let original_card_counts_hash = card_counts_hash.clone();
-    let joker_count = original_card_counts_hash.get(&Card::new('J')).unwrap_or(&0);
-    card_counts_hash.remove(&Card::new('J'));
+    let joker_count = *card_counts_hash.get(joker_card).unwrap_or(&0);
+    card_counts_hash.remove(joker_card);
     let max_count = card_counts_hash.iter().max_by(|x, y| x.1.cmp(y.1));
     if let Some((card, count)) = max_count {
-        card_counts_hash.insert(*card, count + *joker_count);
+        card_counts_hash.insert(*card, count + joker_count);
     } else {
-        card_counts_hash.insert(Card::new('J'), *joker_count);
+        card_counts_hash.insert(*joker_card, joker_count);
     }
-    let card_counts: Vec<&u16> = card_counts_hash.values().collect();
-    let count_counts = counts(&card_counts);
+    card_counts_hash
+}
+
+pub fn determine_hand_type(cards: &[Card; 5], joker_card: &Card) -> HandType {
+    let card_counts: HashMap<Card, u16> = get_card_counts(cards, joker_card);
+    let count_counts = counts(&card_counts.values().collect());
 
     let five_counts = *count_counts.get(&5).unwrap_or(&0);
     let four_counts = *count_counts.get(&4).unwrap_or(&0);
@@ -221,8 +207,9 @@ pub fn parse_hand_cards(cards_input: &str) -> [Card; 5] {
 
 pub fn parse_hand(cards_input: &str) -> Hand {
     let hand_cards: [Card; 5] = parse_hand_cards(cards_input);
-    let hand_type = determine_hand_type_part_1(&hand_cards);
-    Hand::new(hand_cards, hand_type)
+    let hand_type_part_1 = determine_hand_type_part_1(&hand_cards);
+    let hand_type_part_2 = determine_hand_type_part_2(&hand_cards);
+    Hand::new(hand_cards, hand_type_part_1, hand_type_part_2)
 }
 
 fn parse_line(line: &str) -> Bid {
