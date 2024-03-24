@@ -126,6 +126,17 @@ impl Hand {
             card_comparison_result
         }
     }
+
+
+    pub fn cmp_part_2(&self, other: &Self) -> Ordering {
+        let hand_type_comparison = self.hand_type_part_2.cmp(&other.hand_type_part_2);
+        if hand_type_comparison != Ordering::Equal {
+            hand_type_comparison
+        } else {
+            let card_comparison_result = compare::compare_arrays(&self.cards, &other.cards, Card::cmp_part_2);
+            card_comparison_result
+        }
+    }
 }
 
 #[derive(Clone, PartialEq, Eq, PartialOrd, Debug)]
@@ -140,6 +151,9 @@ impl Bid {
     }
     fn cmp_part_1(&self, other: &Self) -> Ordering {
         self.hand.cmp_part_1(&other.hand)
+    }
+    fn cmp_part_2(&self, other: &Self) -> Ordering {
+        self.hand.cmp_part_2(&other.hand)
     }
 }
 
@@ -230,6 +244,7 @@ pub fn solution_part_1(input: &Vec<Bid>) -> u64 {
 }
 
 pub fn solution_part_2(input: &Vec<Bid>) -> u64 {
-    //TODO: Implement
-    1
+    let mut bids: Vec<Bid> = input.clone();
+    bids.sort_by(|x, y| x.cmp_part_2(y));
+    (1..=bids.len()).zip(bids).map(|(rank, bid)| (rank as u64) * (bid.amount as u64)).sum()
 }

@@ -152,7 +152,7 @@ fn test_determine_hand_type_part_2() {
 }
 
 #[test]
-fn test_sorting_of_hands() {
+fn test_sorting_of_hands_part_1() {
     let mut hands: Vec<Hand> = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"]
         .iter().map(|hand_input| day7::parse_hand(hand_input)).collect();
     hands.sort_by(|x, y| x.cmp_part_1(y));
@@ -161,7 +161,22 @@ fn test_sorting_of_hands() {
 }
 
 #[test]
+fn test_sorting_of_hands_part_2() {
+    let mut hands: Vec<Hand> = ["32T3K", "T55J5", "KK677", "KTJJT", "QQQJA"]
+        .iter().map(|hand_input| day7::parse_hand(hand_input)).collect();
+    hands.sort_by(|x, y| x.cmp_part_2(y));
+    let result: Vec<String> = hands.iter().map(|hand| hand.as_string()).collect();
+    assert_eq!(result, ["32T3K", "KK677", "T55J5", "QQQJA", "KTJJT"])
+}
+
+#[test]
 fn test_solution_part_1() {
     let parsed = day7::parse(day7::INPUT);
     assert_eq!(day7::solution_part_1(&parsed), 6440)
+}
+
+#[test]
+fn test_solution_part_2() {
+    let parsed = day7::parse(day7::INPUT);
+    assert_eq!(day7::solution_part_2(&parsed), 5905)
 }
