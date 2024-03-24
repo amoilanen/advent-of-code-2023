@@ -11,6 +11,11 @@ KK677 28
 KTJJT 220
 QQQJA 483";
 
+pub enum TaskPart {
+    One,
+    Two
+}
+
 #[derive(Eq, Hash, PartialOrd, PartialEq, Debug, Clone, Copy)]
 pub struct Card {
     pub value: char
@@ -53,18 +58,22 @@ impl Card {
             _ => 15
         }
     }
+    pub fn rank(&self, part: &TaskPart) -> u16 {
+        match part {
+            TaskPart::One => self.rank_part_1(),
+            TaskPart::Two => self.rank_part_2()
+        }
+    }
     pub fn new(value: char) -> Card {
         Card { value }
     }
-    fn cmp_part_1(first: &Self, second: &Self) -> Ordering {
-        let first_rank = first.rank_part_1();
-        let second_rank: u16 = second.rank_part_1();
-        first_rank.cmp(&second_rank)
-    }
-    fn cmp_part_2(first: &Self, second: &Self) -> Ordering {
-        let first_rank = first.rank_part_2();
-        let second_rank: u16 = second.rank_part_2();
-        first_rank.cmp(&second_rank)
+
+    fn comparator(part: &TaskPart) -> Box<dyn Fn(&Card, &Card) -> Ordering + '_> {
+        return Box::new(move |first: &Card, second: &Card| {
+            let first_rank: u16 = first.rank(part);
+            let second_rank: u16 = second.rank(part);
+            first_rank.cmp(&second_rank)
+        })
     }
 }
 
@@ -117,23 +126,21 @@ impl Hand {
       self.cards.map(|c| c.value.to_string()).concat()
     }
 
-    pub fn cmp_part_1(&self, other: &Self) -> Ordering {
-        let hand_type_comparison = self.hand_type_part_1.cmp(&other.hand_type_part_1);
-        if hand_type_comparison != Ordering::Equal {
-            hand_type_comparison
-        } else {
-            let card_comparison_result = compare::compare_arrays(&self.cards, &other.cards, Card::cmp_part_1);
-            card_comparison_result
+    pub fn cmp(&self, other: &Self, part: &TaskPart) -> Ordering {
+        let hand_type_comparison = match part {
+            TaskPart::One =>
+                self.hand_type_part_1.cmp(&other.hand_type_part_1),
+            TaskPart::Two =>
+                self.hand_type_part_2.cmp(&other.hand_type_part_2)
         }
-    }
-
-
-    pub fn cmp_part_2(&self, other: &Self) -> Ordering {
-        let hand_type_comparison = self.hand_type_part_2.cmp(&other.hand_type_part_2);
+        ;
         if hand_type_comparison != Ordering::Equal {
             hand_type_comparison
         } else {
-            let card_comparison_result = compare::compare_arrays(&self.cards, &other.cards, Card::cmp_part_2);
+            let comparator = Card::comparator(part);
+            let card_comparison_result = compare::compare_arrays(&self.cards, &other.cards, |first, second| {
+                comparator(first, second)
+            });
             card_comparison_result
         }
     }
@@ -149,11 +156,9 @@ impl Bid {
     pub fn new(hand: Hand, amount: u16) -> Bid {
         Bid { hand, amount }
     }
-    fn cmp_part_1(&self, other: &Self) -> Ordering {
-        self.hand.cmp_part_1(&other.hand)
-    }
-    fn cmp_part_2(&self, other: &Self) -> Ordering {
-        self.hand.cmp_part_2(&other.hand)
+
+    fn cmp(&self, other: &Self, part: &TaskPart) -> Ordering {
+        self.hand.cmp(&other.hand, part)
     }
 }
 
@@ -167,12 +172,12 @@ where T: Eq, T: Hash, T: Copy {
     counts
 }
 
-pub fn determine_hand_type_part_1(cards: &[Card; 5]) -> HandType {
-    determine_hand_type(cards, &Card::new('?'))
-}
-
-pub fn determine_hand_type_part_2(cards: &[Card; 5]) -> HandType {
-    determine_hand_type(cards, &Card::new('J'))
+pub fn determine_hand_type_for_part(cards: &[Card; 5], part: &TaskPart) -> HandType {
+    let joker_card: Card = match part {
+        TaskPart::One => Card::new('?'),
+        TaskPart::Two => Card::new('J')
+    };
+    determine_hand_type(cards, &joker_card)
 }
 
 fn get_card_counts(cards: &[Card; 5], joker_card: &Card) -> HashMap<Card, u16> {
@@ -221,8 +226,8 @@ pub fn parse_hand_cards(cards_input: &str) -> [Card; 5] {
 
 pub fn parse_hand(cards_input: &str) -> Hand {
     let hand_cards: [Card; 5] = parse_hand_cards(cards_input);
-    let hand_type_part_1 = determine_hand_type_part_1(&hand_cards);
-    let hand_type_part_2 = determine_hand_type_part_2(&hand_cards);
+    let hand_type_part_1 = determine_hand_type_for_part(&hand_cards, &TaskPart::One);
+    let hand_type_part_2 = determine_hand_type_for_part(&hand_cards, &TaskPart::Two);
     Hand::new(hand_cards, hand_type_part_1, hand_type_part_2)
 }
 
@@ -237,14 +242,16 @@ pub fn parse(input: &str) -> Vec<Bid> {
     parsing::as_lines(input).iter().map(|line| parse_line(line.trim())).collect()
 }
 
-pub fn solution_part_1(input: &Vec<Bid>) -> u64 {
+pub fn solution(input: &Vec<Bid>, part: &TaskPart) -> u64 {
     let mut bids = input.clone();
-    bids.sort_by(|x, y| x.cmp_part_1(y));
+    bids.sort_by(|x, y| x.cmp(y, part));
     (1..=bids.len()).zip(bids).map(|(rank, bid)| (rank as u64) * (bid.amount as u64)).sum()
 }
 
+pub fn solution_part_1(input: &Vec<Bid>) -> u64 {
+    solution(input, &TaskPart::One)
+}
+
 pub fn solution_part_2(input: &Vec<Bid>) -> u64 {
-    let mut bids: Vec<Bid> = input.clone();
-    bids.sort_by(|x, y| x.cmp_part_2(y));
-    (1..=bids.len()).zip(bids).map(|(rank, bid)| (rank as u64) * (bid.amount as u64)).sum()
+    solution(input, &TaskPart::Two)
 }

@@ -1,6 +1,9 @@
 use std::cmp::Ordering;
 
-pub fn compare_arrays<T>(first: &[T], second: &[T], compare_by: fn(&T, &T) -> Ordering) -> Ordering {
+pub fn compare_arrays<T, F>(first: &[T], second: &[T], compare_by: F) -> Ordering
+where
+  F: Fn(&T, &T) -> Ordering
+{
   for (a, b) in first.iter().zip(second.iter()) {
     match compare_by(a, b) {
       Ordering::Less => return Ordering::Less,
