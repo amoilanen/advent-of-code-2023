@@ -15,7 +15,7 @@ fn test_parse_input() {
     GGG = (GGG, GGG)
     ZZZ = (ZZZ, ZZZ)";
 
-    let parsed = day8::parse(input);
+    let parsed = day8::parse(input).unwrap();
     assert_eq!(parsed.instructions, vec![
         Direction::R, Direction::L
     ]);
