@@ -1,8 +1,9 @@
+use std::collections::HashMap;
+use std::error::Error;
+
 use crate::days::parsing;
 use parsing::ParsingError;
 use regex::Regex;
-
-use std::error::Error;
 use core::result::Result::Err;
 
 
@@ -44,6 +45,16 @@ pub struct Map {
     pub nodes: Vec<Node>
 }
 
+impl Map {
+    fn node_hash(&self) -> HashMap<&str, &Node> {
+        let mut hash: HashMap<&str, &Node> = HashMap::new();
+        for node in self.nodes.iter() {
+            hash.insert(&node.label, node);
+        }
+        hash
+    }
+}
+
 fn parse_instructions(instrucitons_input: &str) -> Result<Vec<Direction>, Box<dyn Error>> {
     instrucitons_input.chars().map(|ch| match ch {
         'L' => Ok(Direction::L),
@@ -80,8 +91,33 @@ pub fn parse(input: &str) -> Result<Map, Box<dyn Error>> {
     })
 }
 
+pub fn steps_to_reach(from_node_label: &str, to_node_label: &str, map: &Map) -> u32 {
+    let node_hash = map.node_hash();
+    let mut steps: u32 = 0;
+    let mut instruction_index = 0;
+    let mut current_node_label = from_node_label;
+    while current_node_label != to_node_label {
+        let current_instruction = &map.instructions[instruction_index];
+        let next_node_label = match node_hash.get(current_node_label) {
+            Some(node) =>
+                match current_instruction {
+                    Direction::L => &node.left,
+                    Direction::R => &node.right
+                },
+            None => return 0
+        };
+        current_node_label = next_node_label;
+        steps = steps + 1;
+        instruction_index = instruction_index + 1;
+        if instruction_index >= map.instructions.len() {
+            instruction_index = 0;
+        }
+    }
+    steps
+}
+
 pub fn solution_part_1(parsed_input: &Map) -> u32 {
-    1
+    steps_to_reach("AAA", "ZZZ", parsed_input)
 }
 
 pub fn solution_part_2(parsed_input: &Map) -> u32 {

@@ -29,3 +29,23 @@ fn test_parse_input() {
         Node::new("ZZZ", "ZZZ", "ZZZ")
     ])
 }
+
+#[test]
+fn test_number_of_steps() {
+    let input: &str = "LLR
+    
+    AAA = (BBB, BBB)
+    BBB = (AAA, ZZZ)
+    ZZZ = (ZZZ, ZZZ)
+    ";
+
+    let parsed = day8::parse(input).unwrap();
+
+    assert_eq!(day8::steps_to_reach("AAA", "ZZZ", &parsed), 6)
+}
+
+#[test]
+fn test_solution_1() {
+    let parsed = day8::parse(day8::INPUT).unwrap();
+    assert_eq!(day8::solution_part_1(&parsed), 2)
+}
