@@ -41,8 +41,27 @@ fn test_number_of_steps() {
 
     let parsed = day8::parse(input).unwrap();
 
-    assert_eq!(day8::steps_to_reach("AAA", "ZZZ", &parsed), 6)
+    assert_eq!(day8::steps_to_reach("AAA", |label| label == "ZZZ", &parsed), 6)
 }
+
+#[test]
+fn test_find_gcd() {
+    assert_eq!(day8::greatest_commond_divisor(15, 5), 5);
+    assert_eq!(day8::greatest_commond_divisor(30, 45), 15);
+    assert_eq!(day8::greatest_commond_divisor(13, 17), 1);
+    assert_eq!(day8::greatest_commond_divisor(56, 13), 1);
+    assert_eq!(day8::greatest_commond_divisor(30, 42), 6);
+}
+
+#[test]
+fn test_find_lcm() {
+    assert_eq!(day8::least_common_multiple(15, 5), 15);
+    assert_eq!(day8::least_common_multiple(30, 45), 90);
+    assert_eq!(day8::least_common_multiple(13, 17), 221);
+    assert_eq!(day8::least_common_multiple(56, 13), 728);
+    assert_eq!(day8::least_common_multiple(30, 42), 210);
+}
+
 
 #[test]
 fn test_solution_1() {

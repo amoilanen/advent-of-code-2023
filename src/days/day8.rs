@@ -91,12 +91,13 @@ pub fn parse(input: &str) -> Result<Map, Box<dyn Error>> {
     })
 }
 
-pub fn steps_to_reach(from_node_label: &str, to_node_label: &str, map: &Map) -> u32 {
+pub fn steps_to_reach<F>(from_node_label: &str, to_node_label_predicate: F, map: &Map) -> u32
+where F: Fn(&str) -> bool {
     let node_hash = map.node_hash();
     let mut steps: u32 = 0;
     let mut instruction_index = 0;
     let mut current_node_label = from_node_label;
-    while current_node_label != to_node_label {
+    while !to_node_label_predicate(current_node_label) {
         let current_instruction = &map.instructions[instruction_index];
         let next_node_label = match node_hash.get(current_node_label) {
             Some(node) =>
@@ -116,8 +117,25 @@ pub fn steps_to_reach(from_node_label: &str, to_node_label: &str, map: &Map) -> 
     steps
 }
 
+pub fn greatest_commond_divisor(x: u64, y: u64) -> u64 {
+    let mut a = x;
+    let mut b = y;
+    let mut remainder = a % b;
+    while remainder != 0 {
+        a = b;
+        b = remainder;
+        remainder = a % b;
+    }
+    b
+}
+
+pub fn least_common_multiple(x: u64, y: u64) -> u64 {
+    let gcd = greatest_commond_divisor(x, y);
+    x * y / gcd
+}
+
 pub fn solution_part_1(parsed_input: &Map) -> u32 {
-    steps_to_reach("AAA", "ZZZ", parsed_input)
+    steps_to_reach("AAA", |label| label =="ZZZ", parsed_input)
 }
 
 pub fn solution_part_2(parsed_input: &Map) -> u32 {
