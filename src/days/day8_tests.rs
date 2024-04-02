@@ -1,7 +1,7 @@
 #[cfg(test)]
 use crate::days::day8;
 #[cfg(test)]
-use crate::days::day8::{ Map, Direction, Node };
+use crate::days::day8::{ Direction, Node };
 
 #[test]
 fn test_parse_input() {
