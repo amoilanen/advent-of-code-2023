@@ -6,8 +6,7 @@ use parsing::ParsingError;
 use regex::Regex;
 use core::result::Result::Err;
 
-
-pub const INPUT: &str = "RL
+pub const INPUT_PART_1: &str = "RL
 
 AAA = (BBB, CCC)
 BBB = (DDD, EEE)
@@ -16,6 +15,17 @@ DDD = (DDD, DDD)
 EEE = (EEE, EEE)
 GGG = (GGG, GGG)
 ZZZ = (ZZZ, ZZZ)";
+
+pub const INPUT_PART_2: &str = "LR
+
+11A = (11B, XXX)
+11B = (XXX, 11Z)
+11Z = (11B, XXX)
+22A = (22B, XXX)
+22B = (22C, 22C)
+22C = (22Z, 22Z)
+22Z = (22B, 22B)
+XXX = (XXX, XXX)";
 
 #[derive(PartialEq, Debug)]
 pub enum Direction {
@@ -91,10 +101,10 @@ pub fn parse(input: &str) -> Result<Map, Box<dyn Error>> {
     })
 }
 
-pub fn steps_to_reach<F>(from_node_label: &str, to_node_label_predicate: F, map: &Map) -> u32
+pub fn steps_to_reach<F>(from_node_label: &str, to_node_label_predicate: F, map: &Map) -> u64
 where F: Fn(&str) -> bool {
     let node_hash = map.node_hash();
-    let mut steps: u32 = 0;
+    let mut steps: u64 = 0;
     let mut instruction_index = 0;
     let mut current_node_label = from_node_label;
     while !to_node_label_predicate(current_node_label) {
@@ -134,10 +144,21 @@ pub fn least_common_multiple(x: u64, y: u64) -> u64 {
     x * y / gcd
 }
 
-pub fn solution_part_1(parsed_input: &Map) -> u32 {
+pub fn solution_part_1(parsed_input: &Map) -> u64 {
     steps_to_reach("AAA", |label| label =="ZZZ", parsed_input)
 }
 
-pub fn solution_part_2(parsed_input: &Map) -> u32 {
-    1
+pub fn solution_part_2(parsed_input: &Map) -> u64 {
+    let starting_nodes: Vec<&Node> = parsed_input.nodes.iter().filter(|node| node.label.ends_with("A")).collect();
+    let step_counts: Vec<u64> = starting_nodes.iter().map(
+        |node| 
+        steps_to_reach(&node.label, |label| label.ends_with("Z"), parsed_input)
+    ).collect();
+    if let Some(&(mut minimal_number_of_steps)) = step_counts.first() {
+        for step_count in step_counts {
+            minimal_number_of_steps = least_common_multiple(minimal_number_of_steps, step_count)
+        }
+        return minimal_number_of_steps;
+    }
+    0
 }

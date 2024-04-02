@@ -42,7 +42,8 @@ fn main() {
     println!("{:?}", day7::solution_part_1(&day_7_input_parsed));
     println!("{:?}", day7::solution_part_2(&day_7_input_parsed));
     println!("Day 8:");
-    let day_8_input_parsed = day8::parse(day8::INPUT).unwrap();
-    println!("{:?}", day8::solution_part_1(&day_8_input_parsed));
-    println!("{:?}", day8::solution_part_2(&day_8_input_parsed));
+    let day_8_part_1_input_parsed = day8::parse(day8::INPUT_PART_1).unwrap();
+    println!("{:?}", day8::solution_part_1(&day_8_part_1_input_parsed));
+    let day_8_part_2_input_parsed = day8::parse(day8::INPUT_PART_2).unwrap();
+    println!("{:?}", day8::solution_part_2(&day_8_part_2_input_parsed));
 }

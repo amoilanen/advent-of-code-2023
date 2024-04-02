@@ -65,6 +65,12 @@ fn test_find_lcm() {
 
 #[test]
 fn test_solution_1() {
-    let parsed = day8::parse(day8::INPUT).unwrap();
+    let parsed = day8::parse(day8::INPUT_PART_1).unwrap();
     assert_eq!(day8::solution_part_1(&parsed), 2)
+}
+
+#[test]
+fn test_solution_2() {
+    let parsed = day8::parse(day8::INPUT_PART_2).unwrap();
+    assert_eq!(day8::solution_part_2(&parsed), 6)
 }
