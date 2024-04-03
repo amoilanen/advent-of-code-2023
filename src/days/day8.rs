@@ -65,8 +65,8 @@ impl Map {
     }
 }
 
-fn parse_instructions(instrucitons_input: &str) -> Result<Vec<Direction>, Box<dyn Error>> {
-    instrucitons_input.chars().map(|ch| match ch {
+fn parse_instructions(instructions_input: &str) -> Result<Vec<Direction>, Box<dyn Error>> {
+    instructions_input.chars().map(|ch| match ch {
         'L' => Ok(Direction::L),
         'R' => Ok(Direction::R),
         direction => Err(ParsingError::raise(format!("Unknown direction {}", direction)))
