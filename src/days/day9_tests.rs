@@ -16,3 +16,33 @@ fn test_parse_input() {
         ValueHistory::new(vec![10, 13, 16, 21, 30, 45])
     ])
 }
+
+#[test]
+fn test_pairs_of() {
+    assert_eq!(day9::pairs_of(&vec![1, 2, 3, 4, 5]), vec![(1, 2), (2, 3), (3, 4), (4, 5)]);
+    assert_eq!(day9::pairs_of(&vec![1]), Vec::new());
+    assert_eq!(day9::pairs_of(&Vec::<u32>::new()), Vec::new());
+}
+
+#[test]
+fn test_differences_of() {
+    assert_eq!(day9::differences_of(&vec![1, 2, 4, 7, 11]), vec![1, 2, 3, 4]);
+    assert_eq!(day9::differences_of(&vec![1]), Vec::new());
+    assert_eq!(day9::differences_of(&Vec::<u32>::new()), Vec::new());
+}
+
+#[test]
+fn test_is_all_zeros() {
+    assert!(!day9::is_all_zeros(&vec![1, 2, 3]));
+    assert!(!day9::is_all_zeros(&vec![0, 0, 0, 1, 0]));
+    assert!(day9::is_all_zeros(&vec![0, 0, 0, 0, 0]));
+}
+
+#[test]
+fn test_extrapolate_next() {
+    assert_eq!(day9::extrapolate_next(&vec![0, 3, 6, 9, 12, 15]), 18);
+    assert_eq!(day9::extrapolate_next(&vec![1, 3, 6, 10, 15, 21]), 28);
+    assert_eq!(day9::extrapolate_next(&vec![10, 13, 16, 21, 30, 45]), 68);
+    assert_eq!(day9::extrapolate_next(&vec![0, 1, 2, 3, 4, 5]), 6);
+    assert_eq!(day9::extrapolate_next(&vec![0, 0, 0, 0]), 0);
+}
