@@ -60,7 +60,7 @@ pub fn extrapolate_next(values: &Vec<u32>) -> u32 {
 }
 
 pub fn solution_part_1(input: &Vec<ValueHistory>) -> u32 {
-    1
+    input.iter().map(|history| extrapolate_next(&history.values)).sum()
 }
 
 pub fn solution_part_2(input: &Vec<ValueHistory>) -> u32 {

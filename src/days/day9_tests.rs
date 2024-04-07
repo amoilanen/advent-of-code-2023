@@ -46,3 +46,9 @@ fn test_extrapolate_next() {
     assert_eq!(day9::extrapolate_next(&vec![0, 1, 2, 3, 4, 5]), 6);
     assert_eq!(day9::extrapolate_next(&vec![0, 0, 0, 0]), 0);
 }
+
+#[test]
+fn test_solution_1() {
+    let parsed = day9::parse(day9::INPUT);
+    assert_eq!(day9::solution_part_1(&parsed), 114)
+}
