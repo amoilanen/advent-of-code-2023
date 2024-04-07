@@ -1,3 +1,5 @@
+use std::collections::btree_set::Difference;
+
 use crate::days::parsing;
 
 pub const INPUT: &str = "0 3 6 9 12 15
@@ -7,17 +9,17 @@ pub const INPUT: &str = "0 3 6 9 12 15
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub struct ValueHistory {
-    pub values: Vec<u32>
+    pub values: Vec<i64>
 }
 
 impl ValueHistory {
-    pub fn new(values: Vec<u32>) -> ValueHistory {
+    pub fn new(values: Vec<i64>) -> ValueHistory {
         ValueHistory { values }
     }
 }
 
 fn parse_value_history(value_history_input: &str) -> ValueHistory {
-    let values: Vec<u32> = value_history_input.split(' ').map(|x| x.parse().unwrap()).collect();
+    let values: Vec<i64> = value_history_input.split(' ').map(|x| x.parse().unwrap()).collect();
     ValueHistory::new(values)
 }
 
@@ -37,32 +39,43 @@ pub fn pairs_of<T: Copy>(values: &Vec<T>) -> Vec<(T, T)> {
     result
 }
 
-pub fn differences_of(values: &Vec<u32>) -> Vec<u32> {
+pub fn differences_of(values: &Vec<i64>) -> Vec<i64> {
     let pairs = pairs_of(values);
     pairs.iter().map(|pair| {
         pair.1 - pair.0
     }).collect()
 }
 
-pub fn is_all_zeros(values: &Vec<u32>) -> bool {
+pub fn is_all_zeros(values: &Vec<i64>) -> bool {
     values.iter().all(|x| *x == 0)
 }
 
-pub fn extrapolate_next(values: &Vec<u32>) -> u32 {
+pub fn compute_differences(values: &Vec<i64>) -> Vec<Vec<i64>> {
     let mut current_differences = values.clone();
-    let mut all_differences: Vec<Vec<u32>> = Vec::new();
+    let mut all_differences: Vec<Vec<i64>> = Vec::new();
     while !is_all_zeros(&current_differences) {
         let next_differences = differences_of(&current_differences);
         all_differences.push(current_differences);
         current_differences = next_differences;
     }
+    all_differences
+}
+
+pub fn extrapolate_next(values: &Vec<i64>) -> i64 {
+    let all_differences = compute_differences(values);
     all_differences.iter().map(|differences| differences.last().unwrap()).sum()
 }
 
-pub fn solution_part_1(input: &Vec<ValueHistory>) -> u32 {
+pub fn extrapolate_previous(values: &Vec<i64>) -> i64 {
+    let all_differences = compute_differences(values);
+    let first_elements: Vec<i64> = all_differences.iter().map(|differences| *differences.first().unwrap()).collect();
+    first_elements.iter().rev().fold(0, |acc, x| x - acc)
+}
+
+pub fn solution_part_1(input: &Vec<ValueHistory>) -> i64 {
     input.iter().map(|history| extrapolate_next(&history.values)).sum()
 }
 
-pub fn solution_part_2(input: &Vec<ValueHistory>) -> u32 {
-    1
+pub fn solution_part_2(input: &Vec<ValueHistory>) -> i64 {
+    input.iter().map(|history| extrapolate_previous(&history.values)).sum()
 }
