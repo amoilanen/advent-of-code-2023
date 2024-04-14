@@ -1,5 +1,3 @@
-use std::collections::btree_set::Difference;
-
 use crate::days::parsing;
 
 pub const INPUT: &str = "0 3 6 9 12 15
