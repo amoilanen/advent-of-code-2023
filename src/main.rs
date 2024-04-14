@@ -53,7 +53,7 @@ fn main() {
     println!("{:?}", day9::solution_part_1(&day_9_input_parsed));
     println!("{:?}", day9::solution_part_2(&day_9_input_parsed));
     println!("Day 10:");
-    let day_10_input_parsed = day10::parse(day10::INPUT);
+    let day_10_input_parsed = day10::parse(day10::INPUT).unwrap();
     println!("{:?}", day10::solution_part_1(&day_10_input_parsed));
     println!("{:?}", day10::solution_part_2(&day_10_input_parsed));
 }
