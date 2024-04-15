@@ -14,6 +14,7 @@ LJ...";
 #[derive(Debug)]
 #[derive(PartialEq)]
 #[derive(Eq)]
+#[derive(Hash)]
 #[derive(PartialOrd)]
 pub struct Coord {
     pub x: i32,
@@ -61,6 +62,16 @@ pub struct Landscape {
 impl Landscape {
     pub fn new(starting_title: Coord, connectors: Vec<Connector>) -> Landscape {
         Landscape { starting_title, connectors }
+    }
+
+    pub fn find_loop(&self, from_title: &Coord) -> Vec<Coord> {
+        //TODO: Create a HashMap from Coord to Connector
+        let mut coordinate_connectors: HashMap<&Coord, &Connector> = HashMap::new();
+        for connector in self.connectors.iter() {
+            coordinate_connectors.insert(&connector.position, &connector);
+        }
+        //TODO: Impl, start to traverse counter clock wise, i.e. try to find the first outgoing connection in the direction E -> S -> W -> N
+        Vec::new()
     }
 }
 

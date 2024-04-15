@@ -25,3 +25,22 @@ fn test_parse_input() {
         ]
     ))
 }
+
+#[test]
+fn test_find_loop() {
+    let input: &str = ".....
+    .S-7.
+    .|.|.
+    .L-J.
+    .....";
+
+    let landscape = day10::parse(input).unwrap();
+    let found_loop = landscape.find_loop(&landscape.starting_title);
+    // Counter-clockwise one by one
+    assert_eq!(found_loop, vec![
+        Coord::new(1, 1), Coord::new(1, 2), Coord::new(1, 3),
+        Coord::new(2, 3), Coord::new(3, 3),
+        Coord::new(3, 2), Coord::new(3, 1),
+        Coord::new(2, 1)
+    ])
+}
