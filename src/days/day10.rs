@@ -50,6 +50,16 @@ impl Connector {
         sorted_ports.sort_unstable();
         Connector { position, ports: sorted_ports }
     }
+    pub fn is_connected_with(&self, coord: &Coord) -> bool {
+        self.ports.contains(coord)
+    }
+    pub fn get_other_end_than(&self, other_than: &Coord) -> &Coord {
+        if &self.ports[0] == other_than {
+            &self.ports[1]
+        } else {
+            &self.ports[0]
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -64,14 +74,62 @@ impl Landscape {
         Landscape { starting_title, connectors }
     }
 
-    pub fn find_loop(&self, from_title: &Coord) -> Vec<Coord> {
-        //TODO: Create a HashMap from Coord to Connector
+    fn build_loop_from(&self, from_tile: &Coord, first_edge: &Connector, coordinate_connectors: &HashMap<&Coord, &Connector>) -> Vec<Coord> {
+        let mut current_coord = from_tile;
+        let mut current_edge = Some(&first_edge);
+        let mut no_loop_found = false;
+        let mut found_loop = false;
+        let mut partially_built_loop: Vec<Coord> = Vec::new();
+
+        while !no_loop_found && !found_loop {
+            partially_built_loop.push(current_coord.clone());
+            if let Some(edge) = current_edge {
+                if edge.is_connected_with(current_coord) {
+                    current_coord = edge.get_other_end_than(current_coord);
+                    current_edge = coordinate_connectors.get(current_coord);
+                    if current_coord == from_tile {
+                        found_loop = true;
+                    }
+                } else {
+                    no_loop_found = true;
+                }
+            } else {
+                no_loop_found = true;
+            }
+        }
+        if found_loop {
+            partially_built_loop
+        } else {
+            Vec::new()
+        }
+    }
+
+    pub fn find_loop(&self, from_tile: &Coord) -> Vec<Coord> {
         let mut coordinate_connectors: HashMap<&Coord, &Connector> = HashMap::new();
         for connector in self.connectors.iter() {
             coordinate_connectors.insert(&connector.position, &connector);
         }
-        //TODO: Impl, start to traverse counter clock wise, i.e. try to find the first outgoing connection in the direction E -> S -> W -> N
-        Vec::new()
+        let mut loops : Vec<Vec<Coord>> = Vec::new();
+        let possible_loop_origins = vec![
+            Coord::new(from_tile.x + 1, from_tile.y),
+            Coord::new(from_tile.x, from_tile.y + 1),
+            Coord::new(from_tile.x - 1, from_tile.y),
+            Coord::new(from_tile.x, from_tile.y - 1)
+        ];
+        //TODO: Filter out the same loop being found from two different directions
+        for possible_loop_origin in possible_loop_origins.iter() {
+            if let Some(starting_connector) = coordinate_connectors.get(&possible_loop_origin) {
+                let found_loop = self.build_loop_from(from_tile, *starting_connector, &coordinate_connectors);
+                if found_loop.len() > 0 {
+                    loops.push(found_loop);
+                }
+            }
+        }
+        if let Some(found_loop) = loops.first() {
+            return found_loop.clone()
+        } else {
+            return Vec::new()
+        }
     }
 }
 

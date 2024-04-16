@@ -44,3 +44,7 @@ fn test_find_loop() {
         Coord::new(2, 1)
     ])
 }
+
+//TODO: Test there are two loops starting at the same origin
+//TODO: Test no loop can be found
+//TODO: Test there is a loop, but also a line of edges ending abruptly
