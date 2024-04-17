@@ -75,19 +75,19 @@ impl Landscape {
     }
 
     fn build_loop_from(&self, from_tile: &Coord, first_edge: &Connector, coordinate_connectors: &HashMap<&Coord, &Connector>) -> Vec<Coord> {
-        let mut current_coord = from_tile;
-        let mut current_edge = Some(&first_edge);
+        let mut current_from_coord = from_tile;
+        let mut current_edge_coord = &first_edge.position;
         let mut no_loop_found = false;
         let mut found_loop = false;
-        let mut partially_built_loop: Vec<Coord> = Vec::new();
+        let mut partially_built_loop: Vec<Coord> = vec![from_tile.clone()];
 
         while !no_loop_found && !found_loop {
-            partially_built_loop.push(current_coord.clone());
-            if let Some(edge) = current_edge {
-                if edge.is_connected_with(current_coord) {
-                    current_coord = edge.get_other_end_than(current_coord);
-                    current_edge = coordinate_connectors.get(current_coord);
-                    if current_coord == from_tile {
+            if let Some(edge) = coordinate_connectors.get(current_edge_coord) {
+                partially_built_loop.push(current_edge_coord.clone());
+                if edge.is_connected_with(current_from_coord) {
+                    current_edge_coord = edge.get_other_end_than(current_from_coord);
+                    current_from_coord = &edge.position;
+                    if current_edge_coord == from_tile {
                         found_loop = true;
                     }
                 } else {
