@@ -163,7 +163,9 @@ pub fn parse(input: &str) -> Result<Landscape, Box<dyn Error>>  {
 }
 
 pub fn solution_part_1(input: &Landscape) -> u64 {
-    1
+    let loops = input.find_loops(&input.starting_title);
+    let farthest_distances: Vec<u64> = loops.iter().map(|l| ((l.len() + 1) / 2) as u64).collect();
+    *farthest_distances.first().unwrap()
 }
 
 pub fn solution_part_2(input: &Landscape) -> u64 {
