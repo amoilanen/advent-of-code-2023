@@ -104,7 +104,10 @@ impl Landscape {
         }
     }
 
-    pub fn find_loop(&self, from_tile: &Coord) -> Vec<Coord> {
+    pub fn find_loops(&self, from_tile: &Coord) -> Vec<Vec<Coord>> {
+        fn exists_in_a_loop(coord: &Coord, loops: &Vec<Vec<Coord>>) -> bool {
+            loops.iter().any(|l| l.iter().any(|tile| tile == coord))
+        }
         let mut coordinate_connectors: HashMap<&Coord, &Connector> = HashMap::new();
         for connector in self.connectors.iter() {
             coordinate_connectors.insert(&connector.position, &connector);
@@ -116,20 +119,17 @@ impl Landscape {
             Coord::new(from_tile.x - 1, from_tile.y),
             Coord::new(from_tile.x, from_tile.y - 1)
         ];
-        //TODO: Filter out the same loop being found from two different directions
         for possible_loop_origin in possible_loop_origins.iter() {
-            if let Some(starting_connector) = coordinate_connectors.get(&possible_loop_origin) {
-                let found_loop = self.build_loop_from(from_tile, *starting_connector, &coordinate_connectors);
-                if found_loop.len() > 0 {
-                    loops.push(found_loop);
+            if !exists_in_a_loop(possible_loop_origin, &loops) {
+                if let Some(starting_connector) = coordinate_connectors.get(&possible_loop_origin) {
+                    let found_loop: Vec<Coord> = self.build_loop_from(from_tile, *starting_connector, &coordinate_connectors);
+                    if found_loop.len() > 0 {
+                        loops.push(found_loop);
+                    }
                 }
             }
         }
-        if let Some(found_loop) = loops.first() {
-            return found_loop.clone()
-        } else {
-            return Vec::new()
-        }
+        loops
     }
 }
 

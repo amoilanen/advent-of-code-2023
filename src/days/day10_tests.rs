@@ -27,7 +27,7 @@ fn test_parse_input() {
 }
 
 #[test]
-fn test_find_loop() {
+fn test_find_single_loop() {
     let input: &str = ".....
     .S-7.
     .|.|.
@@ -35,16 +35,24 @@ fn test_find_loop() {
     .....";
 
     let landscape = day10::parse(input).unwrap();
-    let found_loop = landscape.find_loop(&landscape.starting_title);
+    let found_loop = landscape.find_loops(&landscape.starting_title);
     // Counter-clockwise one by one
-    assert_eq!(found_loop, vec![
+    assert_eq!(found_loop, vec![vec![
         Coord::new(1, 1), Coord::new(2, 1), Coord::new(3, 1),
         Coord::new(3, 2), Coord::new(3, 3),
         Coord::new(2, 3), Coord::new(1, 3),
         Coord::new(1, 2)
-    ])
+    ]])
 }
+
+/*
+fn test_find_loop_two_loops_starting_at_same_point() {
+
+}
+*/
 
 //TODO: Test there are two loops starting at the same origin
 //TODO: Test no loop can be found
 //TODO: Test there is a loop, but also a line of edges ending abruptly
+
+//TODO: Test solution_part1
