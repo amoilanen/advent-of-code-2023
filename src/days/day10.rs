@@ -41,14 +41,17 @@ impl Ord for Coord {
 #[derive(PartialEq)]
 pub struct Connector {
     position: Coord,
-    ports: [Coord; 2]
+    ports: [Coord; 2],
+    symbol: char
 }
 
+const LOOP_HORIZONTAL_BOUNDARIES: [char; 3] = ['|', 'L', 'J'];
+
 impl Connector {
-    pub fn new(position: Coord, ports: [Coord; 2]) -> Connector {
+    pub fn new(position: Coord, ports: [Coord; 2], symbol: char) -> Connector {
         let mut sorted_ports = ports.clone();
         sorted_ports.sort_unstable();
-        Connector { position, ports: sorted_ports }
+        Connector { position, ports: sorted_ports, symbol }
     }
     pub fn is_connected_with(&self, coord: &Coord) -> bool {
         self.ports.contains(coord)
@@ -104,14 +107,19 @@ impl Landscape {
         }
     }
 
-    pub fn find_loops(&self, from_tile: &Coord) -> Vec<Vec<Coord>> {
-        fn exists_in_a_loop(coord: &Coord, loops: &Vec<Vec<Coord>>) -> bool {
-            loops.iter().any(|l| l.iter().any(|tile| tile == coord))
-        }
+    fn cooordinate_to_connector(&self) -> HashMap<&Coord, &Connector> {
         let mut coordinate_connectors: HashMap<&Coord, &Connector> = HashMap::new();
         for connector in self.connectors.iter() {
             coordinate_connectors.insert(&connector.position, &connector);
         }
+        coordinate_connectors
+    }
+
+    pub fn find_loops(&self, from_tile: &Coord) -> Vec<Vec<Coord>> {
+        fn exists_in_a_loop(coord: &Coord, loops: &Vec<Vec<Coord>>) -> bool {
+            loops.iter().any(|l| l.iter().any(|tile| tile == coord))
+        }
+        let coordinate_connectors = self.cooordinate_to_connector();
         let mut loops : Vec<Vec<Coord>> = Vec::new();
         let possible_loop_origins = vec![
             Coord::new(from_tile.x + 1, from_tile.y),
@@ -133,14 +141,45 @@ impl Landscape {
     }
 }
 
+pub fn count_enclosed_tiles(tile_loop: &Vec<Coord>, landscape: &Landscape) -> u64 {
+    let coordinate_to_connector = landscape.cooordinate_to_connector();
+    let xs: Vec<i32> = tile_loop.iter().map(|coord| coord.x).collect();
+    let ys: Vec<i32> = tile_loop.iter().map(|coord| coord.y).collect();
+    let min_x = *xs.iter().min().unwrap_or(&0);
+    let max_x = *xs.iter().max().unwrap_or(&0);
+    let min_y = *ys.iter().min().unwrap_or(&0);
+    let max_y = *ys.iter().max().unwrap_or(&0);
+    let mut tile_count: u64 = 0;
+    for y in min_y..=max_y {
+        let mut is_inside_loop = false;
+        for x in min_x..=max_x {
+            let tile_symbol = match coordinate_to_connector.get(&Coord::new(x, y)) {
+                Some(connector) => connector.symbol,
+                None => '.'
+            };
+            let is_loop_tile = tile_loop.contains(&Coord::new(x, y));
+            if is_loop_tile {
+                if LOOP_HORIZONTAL_BOUNDARIES.contains(&tile_symbol) {
+                    is_inside_loop = !is_inside_loop;
+                }
+            } else {
+                if is_inside_loop {
+                    tile_count = tile_count + 1;
+                }
+            }
+        }
+    };
+    tile_count
+}
+
 pub fn parse_connector(x: i32, y: i32, ch: char) -> Result<Connector,  Box<dyn Error>> {
     match ch {
-        '|' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y - 1), Coord::new(x, y + 1)])),
-        '-' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x - 1, y), Coord::new(x + 1, y)])),
-        'L' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y - 1), Coord::new(x + 1, y)])),
-        'J' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y - 1), Coord::new(x - 1, y)])),
-        '7' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y + 1), Coord::new(x - 1, y)])),
-        'F' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y + 1), Coord::new(x + 1, y)])),
+        '|' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y - 1), Coord::new(x, y + 1)], ch)),
+        '-' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x - 1, y), Coord::new(x + 1, y)], ch)),
+        'L' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y - 1), Coord::new(x + 1, y)], ch)),
+        'J' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y - 1), Coord::new(x - 1, y)], ch)),
+        '7' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y + 1), Coord::new(x - 1, y)], ch)),
+        'F' => Ok(Connector::new(Coord::new(x, y), [Coord::new(x, y + 1), Coord::new(x + 1, y)], ch)),
         _ => Err(ParsingError::raise(format!("Unknown connector in {}", ch))),
 
     }
