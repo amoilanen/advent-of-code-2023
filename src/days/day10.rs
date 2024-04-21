@@ -141,8 +141,17 @@ impl Landscape {
     }
 }
 
+pub fn determine_connector_symbol(tile_loop: &Vec<Coord>, tile: &Coord) -> Option<char> {
+    //TODO: Implement
+    Some('F')
+}
+
 pub fn count_enclosed_tiles(tile_loop: &Vec<Coord>, landscape: &Landscape) -> u64 {
-    let coordinate_to_connector = landscape.cooordinate_to_connector();
+    let mut coordinate_to_connector = landscape.cooordinate_to_connector().iter().map(|x| (*x.0, x.1.symbol)).collect::<HashMap<&Coord, char>>();
+    let start_tile_symbol = determine_connector_symbol(tile_loop, &landscape.starting_title);
+    start_tile_symbol.iter().for_each(|symbol| {
+        coordinate_to_connector.insert(&landscape.starting_title, *symbol);
+    });
     let xs: Vec<i32> = tile_loop.iter().map(|coord| coord.x).collect();
     let ys: Vec<i32> = tile_loop.iter().map(|coord| coord.y).collect();
     let min_x = *xs.iter().min().unwrap_or(&0);
@@ -154,7 +163,7 @@ pub fn count_enclosed_tiles(tile_loop: &Vec<Coord>, landscape: &Landscape) -> u6
         let mut is_inside_loop = false;
         for x in min_x..=max_x {
             let tile_symbol = match coordinate_to_connector.get(&Coord::new(x, y)) {
-                Some(connector) => connector.symbol,
+                Some(symbol) => *symbol,
                 None => '.'
             };
             let is_loop_tile = tile_loop.contains(&Coord::new(x, y));

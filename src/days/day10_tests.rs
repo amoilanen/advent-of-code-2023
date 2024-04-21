@@ -157,6 +157,66 @@ fn test_internal_tiles_third_example_loop() {
 }
 
 #[test]
+fn test_determine_connector_symbol_j() {
+    let input: &str = "....
+    .F7.
+    .LS.";
+
+    let landscape = day10::parse(input).unwrap();
+    let loops = landscape.find_loops(&landscape.starting_title);
+    let found_loop = loops.first().unwrap();
+    assert_eq!(Some('J'), day10::determine_connector_symbol(found_loop, &landscape.starting_title))
+}
+
+#[test]
+fn test_determine_connector_symbol_f() {
+    let input: &str = "....
+    .S7.
+    .LJ.";
+
+    let landscape = day10::parse(input).unwrap();
+    let loops = landscape.find_loops(&landscape.starting_title);
+    let found_loop = loops.first().unwrap();
+    assert_eq!(Some('F'), day10::determine_connector_symbol(found_loop, &landscape.starting_title))
+}
+
+#[test]
+fn test_determine_connector_symbol_7() {
+    let input: &str = "....
+    .FS.
+    .LJ.";
+
+    let landscape = day10::parse(input).unwrap();
+    let loops = landscape.find_loops(&landscape.starting_title);
+    let found_loop = loops.first().unwrap();
+    assert_eq!(Some('7'), day10::determine_connector_symbol(found_loop, &landscape.starting_title))
+}
+
+#[test]
+fn test_determine_connector_symbol_l() {
+    let input: &str = "....
+    .F7.
+    .SJ.";
+
+    let landscape = day10::parse(input).unwrap();
+    let loops = landscape.find_loops(&landscape.starting_title);
+    let found_loop = loops.first().unwrap();
+    assert_eq!(Some('L'), day10::determine_connector_symbol(found_loop, &landscape.starting_title))
+}
+
+#[test]
+fn test_determine_connector_symbol_not_in_loop() {
+    let input: &str = "....
+    .F7.
+    .SJ.";
+
+    let landscape = day10::parse(input).unwrap();
+    let loops = landscape.find_loops(&landscape.starting_title);
+    let found_loop = loops.first().unwrap();
+    assert_eq!(None, day10::determine_connector_symbol(found_loop, &Coord::new(1, 0)));
+}
+
+#[test]
 fn test_solution_1() {
     let parsed = day10::parse(day10::INPUT).unwrap();
     assert_eq!(day10::solution_part_1(&parsed), 8)
