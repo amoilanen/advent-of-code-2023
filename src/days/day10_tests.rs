@@ -221,3 +221,9 @@ fn test_solution_1() {
     let parsed = day10::parse(day10::INPUT).unwrap();
     assert_eq!(day10::solution_part_1(&parsed), 8)
 }
+
+#[test]
+fn test_solution_2() {
+    let parsed = day10::parse(day10::INPUT).unwrap();
+    assert_eq!(day10::solution_part_2(&parsed), 1)
+}

@@ -252,5 +252,7 @@ pub fn solution_part_1(input: &Landscape) -> u64 {
 }
 
 pub fn solution_part_2(input: &Landscape) -> u64 {
-    1
+    let loops = input.find_loops(&input.starting_title);
+    let first_loop = loops.first().unwrap();
+    count_enclosed_tiles(first_loop, &input)
 }
