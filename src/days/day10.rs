@@ -142,8 +142,43 @@ impl Landscape {
 }
 
 pub fn determine_connector_symbol(tile_loop: &Vec<Coord>, tile: &Coord) -> Option<char> {
-    //TODO: Implement
-    Some('F')
+    let mut result: Option<char> = None;
+    if let Some(tile_index) = tile_loop.iter().position(|t| t == tile) {
+        let previous_tile_index = if tile_index == 0 {
+            tile_loop.len() - 1
+        } else {
+            tile_index - 1
+        };
+        let next_tile_index = if tile_index == tile_loop.len() - 1 {
+            0
+        } else {
+            tile_index + 1
+        };
+        if let Some(previous_tile) = tile_loop.get(previous_tile_index) {
+            if let Some(next_tile) = tile_loop.get(next_tile_index) {
+                let next_x_diff = next_tile.x - tile.x;
+                let next_y_diff = next_tile.y - tile.y;
+                let previous_x_diff = previous_tile.x - tile.x;
+                let previous_y_diff = previous_tile.y - tile.y;
+                result = match (next_x_diff, next_y_diff, previous_x_diff, previous_y_diff) {
+                    (1, 0, 0, 1) => Some('F'),
+                    (0, 1, 1, 0) => Some('F'),
+                    (-1, 0, 0, 1) => Some('7'),
+                    (0, 1, -1, 0) => Some('7'),
+                    (0, -1, -1, 0) => Some('J'),
+                    (-1, 0, 0, -1) => Some('J'),
+                    (0, -1, 1, 0) => Some('L'),
+                    (1, 0, 0, -1) => Some('L'),
+                    (1, 0, -1, 0) => Some('-'),
+                    (-1, 0, 1, 0) => Some('-'),
+                    (0, 1, 0, -1) => Some('|'),
+                    (0, -1, 0, 1) => Some('|'),
+                    _ => None
+                }
+            }
+        }
+    }
+    return result;
 }
 
 pub fn count_enclosed_tiles(tile_loop: &Vec<Coord>, landscape: &Landscape) -> u64 {
