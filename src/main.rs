@@ -10,6 +10,7 @@ pub use crate::days::day7;
 pub use crate::days::day8;
 pub use crate::days::day9;
 pub use crate::days::day10;
+pub use crate::days::day11;
 
 fn main() {
     println!("Day 1:");
