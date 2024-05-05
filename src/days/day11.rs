@@ -44,31 +44,37 @@ impl Universe {
 impl Universe {
 
     pub fn expand(self) -> Universe {
-        let mut x_increments: HashMap<&Galaxy, u32> = HashMap::new();
-        let mut y_increments: HashMap<&Galaxy, u32> = HashMap::new();
-        let distinct_xs: Vec<u32> = collections::unique(&self.galaxies.clone().iter().map(|g| g.coord.x).collect());
-        let distinct_ys: Vec<u32> = collections::unique(&self.galaxies.clone().iter().map(|g| g.coord.y).collect());
+        self
+          .expand_dimension(
+            |g| g.coord.x,
+            |g, updated_x| Galaxy::new(updated_x, g.coord.y)
+          )
+          .expand_dimension(
+            |g| g.coord.y,
+            |g, updated_y| Galaxy::new(g.coord.x, updated_y)
+          )
+    }
+
+    fn expand_dimension<F1, F2>(self, get_coord: F1, update_coord: F2) -> Universe
+    where
+      F1: Fn(&Galaxy) -> u32,
+      F2: Fn(&Galaxy, u32) -> Galaxy
+    {
+        let mut coord_increments: HashMap<&Galaxy, u32> = HashMap::new();
+        let distinct_coords: Vec<u32> = collections::unique(&self.galaxies.clone().iter().map(|g| get_coord(&g)).collect());
         for galaxy in self.galaxies.iter() {
-            let mut empty_columns_before = galaxy.coord.x;
-            let mut empty_rows_before = galaxy.coord.y;
-            for other_galaxy_x in distinct_xs.iter() {
-                if other_galaxy_x < &galaxy.coord.x {
-                    empty_columns_before = empty_columns_before - 1;
+            let mut empty_places_before = get_coord(&galaxy);
+            for other_galaxy_coord in distinct_coords.iter() {
+                if other_galaxy_coord < &get_coord(&galaxy) {
+                    empty_places_before = empty_places_before - 1;
                 }
             }
-            for other_galaxy_y in distinct_ys.iter() {
-                if other_galaxy_y < &galaxy.coord.y {
-                    empty_rows_before = empty_rows_before - 1;
-                }
-            }
-            x_increments.insert(galaxy, empty_columns_before);
-            y_increments.insert(galaxy, empty_rows_before);
+            coord_increments.insert(galaxy, empty_places_before);
         }
         let mut updated_galaxies: Vec<Galaxy> = Vec::new();
         for galaxy in self.galaxies.iter() {
-            let updated_x = galaxy.coord.x + x_increments.get(&galaxy).unwrap_or(&0);
-            let updated_y = galaxy.coord.y + y_increments.get(&galaxy).unwrap_or(&0);
-            let updated_galaxy: Galaxy = Galaxy::new(updated_x, updated_y);
+            let updated_coord = get_coord(&galaxy) + coord_increments.get(&galaxy).unwrap_or(&0);
+            let updated_galaxy: Galaxy = update_coord(&galaxy, updated_coord);
             updated_galaxies.push(updated_galaxy);
         }
         Universe::new(updated_galaxies)
