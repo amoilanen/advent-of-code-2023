@@ -28,6 +28,9 @@ impl Galaxy {
     pub fn new(x: u32, y: u32) -> Galaxy {
         Galaxy { coord: Coord { x, y } }
     }
+    pub fn distance_to(self, other: &Galaxy) -> u32 {
+        self.coord.x.abs_diff(other.coord.x) + self.coord.y.abs_diff(other.coord.y)
+    }
 }
 
 #[derive(Clone, Debug, Hash, PartialEq)]
@@ -78,6 +81,23 @@ impl Universe {
             updated_galaxies.push(updated_galaxy);
         }
         Universe::new(updated_galaxies)
+    }
+}
+
+pub fn compute_coefficients(galaxy_number: u32) -> Vec<u32> {
+    if galaxy_number == 2 {
+        return vec![1]
+    } else if galaxy_number > 2 {
+        let previous_coefficients = compute_coefficients(galaxy_number - 2);
+        let mut coefficients: Vec<u32> = Vec::new();
+        coefficients.push(galaxy_number - 1);
+        for coefficient in previous_coefficients.iter() {
+            coefficients.push(coefficient + galaxy_number - 1)
+        }
+        coefficients.push(galaxy_number - 1);
+        return coefficients
+    } else {
+        return Vec::new()
     }
 }
 

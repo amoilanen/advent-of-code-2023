@@ -1,3 +1,4 @@
+use crate::day11::compute_coefficients;
 #[cfg(test)]
 use crate::days::day11;
 #[cfg(test)]
@@ -55,3 +56,23 @@ fn test_universe_expansion() {
     let expanded_universe = day11::parse(expanded_input);
     assert_eq!(expanded_universe, universe.expand())
 }
+
+#[test]
+fn test_galaxy_distance_to() {
+    let first = Galaxy::new(1, 6);
+    let second = Galaxy::new(5, 11);
+    assert_eq!(first.distance_to(&second), 9);
+}
+
+#[test]
+fn test_compute_coefficients() {
+    assert_eq!(compute_coefficients(0), Vec::new());
+    assert_eq!(compute_coefficients(1), Vec::new());
+    assert_eq!(compute_coefficients(2), vec![1]);
+    assert_eq!(compute_coefficients(3), vec![2, 2]);
+    assert_eq!(compute_coefficients(4), vec![3, 4, 3]);
+    assert_eq!(compute_coefficients(5), vec![4, 6, 6, 4]);
+    assert_eq!(compute_coefficients(6), vec![5, 8, 9, 8, 5]);
+    assert_eq!(compute_coefficients(7), vec![6, 10, 12, 12, 10, 6]);
+}
+
