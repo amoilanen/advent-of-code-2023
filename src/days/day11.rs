@@ -2,6 +2,8 @@ use crate::days::parsing;
 use crate::days::collections;
 use std::collections::HashMap;
 
+use super::collections::pairs_of;
+
 pub const INPUT: &str = "...#......
 .......#..
 #.........
@@ -114,10 +116,20 @@ pub fn parse(input: &str) -> Universe  {
     Universe::new(galaxies)
 }
 
-pub fn solution_part_1(input: &Universe) -> u64 {
-    1
+pub fn solution_part_1(universe: &Universe) -> u64 {
+    let expanded_universe: Universe = (*universe).clone().expand();
+    let coefficients = compute_coefficients(expanded_universe.galaxies.len() as u32);
+    let mut galaxy_xs: Vec<u32> = expanded_universe.galaxies.iter().map(|g| g.coord.x).collect();
+    galaxy_xs.sort();
+    let galaxy_x_intervals: Vec<u32> = pairs_of(&galaxy_xs).iter().map(|(current, next)| next - current).collect();
+    let mut galaxy_ys: Vec<u32> = expanded_universe.galaxies.iter().map(|g| g.coord.x).collect();
+    galaxy_ys.sort();
+    let galaxy_y_intervals: Vec<u32> = pairs_of(&galaxy_ys).iter().map(|(current, next)| next - current).collect();
+    let x_distance: u32 = galaxy_x_intervals.iter().zip(coefficients.iter()).map(|(distance, coefficient)| distance * coefficient).sum();
+    let y_distance: u32 = galaxy_y_intervals.iter().zip(coefficients.iter()).map(|(distance, coefficient)| distance * coefficient).sum();
+    (x_distance + y_distance) as u64
 }
 
-pub fn solution_part_2(input: &Universe) -> u64 {
+pub fn solution_part_2(input: Universe) -> u64 {
     1
 }

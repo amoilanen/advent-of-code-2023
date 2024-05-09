@@ -76,3 +76,8 @@ fn test_compute_coefficients() {
     assert_eq!(compute_coefficients(7), vec![6, 10, 12, 12, 10, 6]);
 }
 
+#[test]
+fn test_solution_1() {
+    let parsed = day11::parse(day11::INPUT);
+    assert_eq!(day11::solution_part_1(&parsed), 374);
+}
