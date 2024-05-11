@@ -30,7 +30,7 @@ impl Galaxy {
     pub fn new(x: u32, y: u32) -> Galaxy {
         Galaxy { coord: Coord { x, y } }
     }
-    pub fn distance_to(self, other: &Galaxy) -> u32 {
+    pub fn distance_to(&self, other: &Galaxy) -> u32 {
         self.coord.x.abs_diff(other.coord.x) + self.coord.y.abs_diff(other.coord.y)
     }
 }
@@ -116,7 +116,7 @@ pub fn parse(input: &str) -> Universe  {
     Universe::new(galaxies)
 }
 
-pub fn solution_part_1(universe: &Universe) -> u64 {
+pub fn sum_of_all_distances_in_expanded_universe(universe: &Universe) -> u64 {
     let expanded_universe: Universe = (*universe).clone().expand();
     let coefficients = compute_coefficients(expanded_universe.galaxies.len() as u32);
     let mut galaxy_xs: Vec<u32> = expanded_universe.galaxies.iter().map(|g| g.coord.x).collect();
@@ -128,6 +128,21 @@ pub fn solution_part_1(universe: &Universe) -> u64 {
     let x_distance: u32 = galaxy_x_intervals.iter().zip(coefficients.iter()).map(|(distance, coefficient)| distance * coefficient).sum();
     let y_distance: u32 = galaxy_y_intervals.iter().zip(coefficients.iter()).map(|(distance, coefficient)| distance * coefficient).sum();
     (x_distance + y_distance) as u64
+}
+
+pub fn slower_sum_of_all_distances_in_expanded_universe(universe: &Universe) -> u64 {
+    let expanded_universe: Universe = (*universe).clone().expand();
+    let mut full_distance: u64 = 0;
+    for first in expanded_universe.galaxies.iter() {
+        for second in expanded_universe.galaxies.iter() {
+            full_distance = full_distance + first.distance_to(second) as u64
+        }
+    }
+    full_distance / 2
+}
+
+pub fn solution_part_1(universe: &Universe) -> u64 {
+    slower_sum_of_all_distances_in_expanded_universe(universe)
 }
 
 pub fn solution_part_2(input: Universe) -> u64 {
