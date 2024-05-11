@@ -57,4 +57,8 @@ fn main() {
     let day_10_input_parsed = day10::parse(day10::INPUT).unwrap();
     println!("{:?}", day10::solution_part_1(&day_10_input_parsed));
     println!("{:?}", day10::solution_part_2(&day_10_input_parsed));
+    println!("Day 11");
+    let day_11_input_parsed = day11::parse(day11::INPUT);
+    println!("{:?}", day11::solution_part_1(&day_11_input_parsed));
+    println!("{:?}", day11::solution_part_2(&day_11_input_parsed));
 }
